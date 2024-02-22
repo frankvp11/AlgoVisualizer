@@ -7,7 +7,7 @@ Todo:
 2. Algorithms we need: 
    1. Depth of Binary Tree
    2. Dijkstras
-   3. Binary Search
+   3. Binary Search (Complete - Add description )
    4. Some form of sort (perhaps merge/quick)
    5. Hashing
    6. Disjoint Set unions

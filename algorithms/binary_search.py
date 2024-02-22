@@ -43,16 +43,12 @@ def start_timer(svgcontent, numbers, target=None):
     global timer
     previous = [0]
     numbers2 = numbers
-    print(target)
     low  =0
     high = len(numbers2) - 1
     def update_previous(svgcontent):
         nonlocal numbers2, low, high
         middle = (low + high) // 2
         if numbers2[middle] == target:
-            print("Target found!")
-            print("Found target: ", target)
-            print("Middle: ", middle)
 
             svgcontent.update_polygons(middle, color='green')
             timer.cancel()
@@ -83,7 +79,7 @@ def add():
         with ui.row().style("width: 100vw; justify-content:center; text-align:center; align-items:center;"):
             ui.label("Binary Search Algorithm").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
         with ui.row():
-            numbers= sorted([ random.randint(0, 100) for i in range(20)])
+            numbers= sorted(random.sample(range(1, 100), 20))
             target = numbers[2]
             def update_target(e):
                 nonlocal target
@@ -92,7 +88,7 @@ def add():
                 except ValueError:
                     pass
 
-            image = ui.interactive_image(source="/static/binarytreesvg.svg").style("width: 2000px;")
+            image = ui.interactive_image(source="/static/binsearchsvg.svg").style("width: 2000px;")
             svgcontent=  SVGContent(make_row_of_numbers(numbers))
 
             image.bind_content_from(svgcontent, 'content')
