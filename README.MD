@@ -3,9 +3,8 @@ Algorithm Learning Website
 
 
 Todo:
-1. Work on Main UI - decide on if we want to do a sidebar way of choosing which animation to go to or using cards on the center screen (rn I like the cards idea better)
-2. Write algorithms with visualization software provided by ModelMaker
-3. Algorithms we need: 
+1. Write algorithms with visualization software provided by ModelMaker
+2. Algorithms we need: 
    1. Depth of Binary Tree
    2. Dijkstras
    3. Binary Search

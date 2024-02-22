@@ -19,8 +19,9 @@ def add():
     pages = ["Depth of Binary Tree", "Dijkstras", "Binary Search"]
     icons = ["/static/binarytree.png", "/static/dijkstras.png", "/static/binsearch.png"]
     targets = ["depth_of_binary_tree", "dijkstras", "binary_search"]
-    for i in range(len(pages)):
-        with ui.link(
+    with ui.row():
+        for i in range(len(pages)):
+            with ui.link(
                 text="",
                 target=f"/algorithms/{targets[i]}").style("text-decoration:none; color: black; display: flex; float: left;"):           
               with ui.card():
