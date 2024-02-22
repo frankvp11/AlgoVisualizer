@@ -17,14 +17,14 @@ class BinaryTree:
     def insert(self, value, x, y):
         if value < self.value:
             if self.left is None:
-                self.left = BinaryTree(value, x-25, y+25)
+                self.left = BinaryTree(value, x-50, y+50)
             else:
-                self.left.insert(value, x-25, y+25)
+                self.left.insert(value, x-50, y+50)
         else:
             if self.right is None:
-                self.right = BinaryTree(value, x+25, y+25)
+                self.right = BinaryTree(value, x+50, y+50)
             else:
-                self.right.insert(value, x+25, y+25)
+                self.right.insert(value, x+50, y+50)
 
 def determine_binary_tree_depth_next_step_recursive(root, current_depth=1):
     if root is None:
@@ -57,8 +57,8 @@ def make_tree_polygons(tree):
         
 
 def make_tree():
-    # num_nodes = random.randint(5, 10)
-    num_nodes = 5
+    num_nodes = random.randint(5, 10)
+    # num_nodes = 5
     values = random.sample(range(1, 100), num_nodes)
     tree = BinaryTree(values[0], 100, 50)
     for value in values[1:]:
@@ -67,20 +67,13 @@ def make_tree():
     polygons = make_tree_polygons(tree)    
 
     group = ShapeCollection.ShapeCollection(polygons)
-    group.move_all(0, 0)
+    group.move_all(150, 0)
     return group, tree
 
 
 
-def timer_callback(step, svgcontent):
-    global timer
-    if step == []:
-        timer.cancel()
-        return
-    svgcontent.update_polygons(step[0].polygon[0], 'red')
-    step[0].polygon[0].set_color('red')
-    print("Depth:", step[1])
-    print("Tree:", step[0].value)
+
+
 
 
 
@@ -88,8 +81,26 @@ def timer_callback(step, svgcontent):
 
 def start_timer(tree, svgcontent):
     global timer
-    steps = determine_binary_tree_depth_next_step_recursive(tree)
-    timer = ui.timer(2, lambda : timer_callback(next(steps, []), svgcontent))
+    index = [0]
+    def timer_callback(steps, svgcontent):
+        global timer
+        index[0] += 1
+        if index[0] >= len(steps):
+            svgcontent.update_polygons(steps[index[0]-1][0].polygon[0], 'black')
+
+            timer.cancel()
+            return
+        
+        
+        
+        svgcontent.update_polygons(steps[index[0]][0].polygon[0], 'red')
+        svgcontent.update_polygons(steps[index[0]-1][0].polygon[0], 'black')
+        # step[0].polygon[0].set_color('red')
+        print("Depth:", steps[index[0]][1])
+        print("Tree:", steps[index[0]][0].value)
+
+    steps = [s for s in determine_binary_tree_depth_next_step_recursive(tree)]
+    timer = ui.timer(2, lambda : timer_callback(steps, svgcontent))
 
 
 def add():
@@ -103,8 +114,8 @@ def add():
 
         with ui.row().style("width: 100vw; justify-content:center; text-align:center; align-items:center;"):
             ui.label("Depth of Binary Tree Algorithm").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
-        with ui.row():
-            image = ui.interactive_image(source="/static/binarytreesvg.svg").style("width: 500px; height: 500px;")
+        with ui.row().style("width: 100vw; justify-content:center; text-align:center; align-items:center;"):
+            image = ui.interactive_image(source="/static/binarytreesvg.svg").style("width: 400px; height: 400px;")
             polygons, tree = make_tree()
             svgcontent = SVGContent(polygons)
             image.bind_content_from(svgcontent, 'content')
