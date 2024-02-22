@@ -1,0 +1,3 @@
+[submodule "ModelMaker"]
+	path = ModelMaker
+	url = https://github.com/frankvp11/ModelMaker.git
