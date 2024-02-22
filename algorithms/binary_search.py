@@ -16,8 +16,8 @@ class SVGContent():
         self.content = polygons.to_svg()
         self.polygons = polygons
     
-    def update_polygons(self, index):
-        self.polygons.polygons[index].set_color("red")
+    def update_polygons(self, index, color='red'):
+        self.polygons.polygons[index].set_color(color)
         self.content = self.polygons.to_svg()
 
 
@@ -43,22 +43,28 @@ def start_timer(svgcontent, numbers, target=None):
     global timer
     previous = [0]
     numbers2 = numbers
-    target = numbers[2]
+    print(target)
+    low  =0
+    high = len(numbers2) - 1
     def update_previous(svgcontent):
-        nonlocal numbers2
-        middle = len(numbers2) // 2
+        nonlocal numbers2, low, high
+        middle = (low + high) // 2
+        if numbers2[middle] == target:
+            print("Target found!")
+            print("Found target: ", target)
+            print("Middle: ", middle)
 
-        if middle == target:
+            svgcontent.update_polygons(middle, color='green')
             timer.cancel()
             return
-        if numbers2[middle] < target:
-            numbers2 = numbers2[middle:]
+        elif numbers2[middle] < target:
+            low = middle + 1
             for i in range(middle):
                 svgcontent.update_polygons(i)
         else:
-            numbers2 = numbers2[:middle]
-            for i in range(middle, 20):
+            for i in range(middle, len(numbers2)):
                 svgcontent.update_polygons(i)
+            high = middle - 1
 
         previous[0] += 1
 
@@ -78,14 +84,22 @@ def add():
             ui.label("Binary Search Algorithm").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
         with ui.row():
             numbers= sorted([ random.randint(0, 100) for i in range(20)])
+            target = numbers[2]
+            def update_target(e):
+                nonlocal target
+                try:
+                    target = int(e.value)
+                except ValueError:
+                    pass
 
             image = ui.interactive_image(source="/static/binarytreesvg.svg").style("width: 2000px;")
             svgcontent=  SVGContent(make_row_of_numbers(numbers))
 
             image.bind_content_from(svgcontent, 'content')
-
         with ui.row():
-            ui.button("Start animation", on_click=lambda e : start_timer(svgcontent, numbers))
+            ui.input("Target", value=target, on_change=lambda e: update_target(e))
+        with ui.row():
+            ui.button("Start animation", on_click=lambda e : start_timer(svgcontent, numbers, target))
         with ui.row():
             ui.button("Stop animation", on_click=lambda e : timer.deactivate())
         with ui.row():
