@@ -7,6 +7,10 @@ sys.path.append('/home/frank/Projects/Python/Algorithms')
 from ModelMaker.graphicsSVG2 import Rectangle, Text, ShapeCollection
 
 
+
+timer = None
+
+
 class SVGContent():
     def __init__(self, polygons) -> None:
         self.content = polygons.to_svg()
@@ -36,6 +40,7 @@ def make_row_of_numbers(numbers):
 
 
 def start_timer(svgcontent, numbers, target=None):
+    global timer
     previous = [0]
     numbers2 = numbers
     target = numbers[2]
@@ -59,20 +64,30 @@ def start_timer(svgcontent, numbers, target=None):
 
     timer = ui.timer(2, lambda : update_previous(svgcontent))
 
-
 def add():
+
     with ui.header():
         with ui.link(target="/"):
             ui.button(icon="home")
-    with ui.row().style("width: 100vw; justify-content:center; text-align:center; align-items:center;"):
-        ui.label("Binary Search Algorithm").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
-    with ui.row():
-        numbers= sorted([ random.randint(0, 100) for i in range(20)])
 
-        image = ui.interactive_image(source="/static/binarytreesvg.svg").style("width: 2000px;")
-        svgcontent=  SVGContent(make_row_of_numbers(numbers))
 
-        image.bind_content_from(svgcontent, 'content')
+    @ui.refreshable
+    def stuff():
+        global timer
+        with ui.row().style("width: 100vw; justify-content:center; text-align:center; align-items:center;"):
+            ui.label("Binary Search Algorithm").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
+        with ui.row():
+            numbers= sorted([ random.randint(0, 100) for i in range(20)])
 
-    with ui.row():
-        ui.button("Start animation", on_click=lambda e : start_timer(svgcontent, numbers))
+            image = ui.interactive_image(source="/static/binarytreesvg.svg").style("width: 2000px;")
+            svgcontent=  SVGContent(make_row_of_numbers(numbers))
+
+            image.bind_content_from(svgcontent, 'content')
+
+        with ui.row():
+            ui.button("Start animation", on_click=lambda e : start_timer(svgcontent, numbers))
+        with ui.row():
+            ui.button("Stop animation", on_click=lambda e : timer.deactivate())
+        with ui.row():
+            ui.button("Reset", on_click=lambda e : stuff.refresh())
+    stuff()
