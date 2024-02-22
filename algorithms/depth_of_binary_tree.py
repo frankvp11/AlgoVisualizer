@@ -5,6 +5,7 @@ sys.path.append('/home/frank/Projects/Python/Algorithms')
 from ModelMaker.graphicsSVG2 import Rectangle, Text, ShapeCollection, Circle, Polygon
 
 
+timer = None
 
 class BinaryTree:
     def __init__(self, value, x, y) -> None:
@@ -24,16 +25,28 @@ class BinaryTree:
                 self.right = BinaryTree(value, x+25, y+25)
             else:
                 self.right.insert(value, x+25, y+25)
-    
+
+def determine_binary_tree_depth_next_step_recursive(root, current_depth=1):
+    if root is None:
+        return
+    else:
+        yield root, current_depth
+        if root.left:
+            yield from determine_binary_tree_depth_next_step_recursive(root.left, current_depth + 1)
+        if root.right:
+            yield from determine_binary_tree_depth_next_step_recursive(root.right, current_depth + 1)
+
 
 class SVGContent():
     def __init__(self, polygons) -> None:
         self.content = polygons.to_svg()
         self.polygons = polygons
     
-    def update_polygons(self, index, color='red'):
-        self.polygons.polygons[index].set_color(color)
+    def update_polygons(self, polygon, color='red'):
+        self.polygons.polygons[self.polygons.polygons.index(polygon)].set_color(color)
+        # self.polygons.polygons[index].set_color(color)
         self.content = self.polygons.to_svg()
+
 
 
 def make_tree_polygons(tree):
@@ -55,9 +68,28 @@ def make_tree():
 
     group = ShapeCollection.ShapeCollection(polygons)
     group.move_all(0, 0)
-    return group
+    return group, tree
 
 
+
+def timer_callback(step, svgcontent):
+    global timer
+    if step == []:
+        timer.cancel()
+        return
+    svgcontent.update_polygons(step[0].polygon[0], 'red')
+    step[0].polygon[0].set_color('red')
+    print("Depth:", step[1])
+    print("Tree:", step[0].value)
+
+
+
+    
+
+def start_timer(tree, svgcontent):
+    global timer
+    steps = determine_binary_tree_depth_next_step_recursive(tree)
+    timer = ui.timer(2, lambda : timer_callback(next(steps, []), svgcontent))
 
 
 def add():
@@ -72,11 +104,13 @@ def add():
         with ui.row().style("width: 100vw; justify-content:center; text-align:center; align-items:center;"):
             ui.label("Depth of Binary Tree Algorithm").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
         with ui.row():
-            image = ui.interactive_image(source="/static/binarytreesvg.svg").style("width: 80vw; height: 80vh;")
-            tree = make_tree()
-            svgcontent = SVGContent(tree)
+            image = ui.interactive_image(source="/static/binarytreesvg.svg").style("width: 500px; height: 500px;")
+            polygons, tree = make_tree()
+            svgcontent = SVGContent(polygons)
             image.bind_content_from(svgcontent, 'content')
         with ui.row():
             ui.button("Refresh", on_click= lambda e : stuff.refresh())
 
+        with ui.row():
+            ui.button("Start timer", on_click= lambda e : start_timer(tree, svgcontent))
     stuff()
