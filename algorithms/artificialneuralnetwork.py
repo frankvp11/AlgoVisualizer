@@ -42,6 +42,8 @@ class ANN():
         self.content = self.graph.to_svg()
         self.previous_contours = []
         self.current_epoch = 0
+        self.timer_speed = 1
+        self.timer = None
 
     def get_points(self):
         centers = [[-2.5, -2.5], [1.5, -1.5], [2.5, 2.5]]
@@ -57,10 +59,21 @@ class ANN():
         return X, y
     
     def start_timer(self):
-        self.timer = ui.timer(interval=1, callback=self.run_epoch)
+        if self.timer_speed == None:
+            self.timer_speed = 1
+        self.timer = ui.timer(interval=(1 / self.timer_speed), callback=self.run_epoch)
 
     def stop_timer(self):
-        self.timer.deactivate()
+        if self.timer == None:
+            return
+        if self.timer.active:
+
+            self.timer.deactivate()
+        else:
+            self.resume_timer()
+    def resume_timer(self):
+        self.timer.activate()
+
     def end_timer(self):
         self.timer.cancel()
 
@@ -102,24 +115,24 @@ class ANN():
         contours = plt.contourf(xx, yy, Z, alpha=0.5, levels=2)
         answers = []
         for i in range(len(contours.collections)): # 
-            print(i)
             
-            
-            vertices = []
-            for path in ((contours.collections[i].get_paths())[0].vertices):
-                vertices.append([path[0]*10, path[1]*10])
+            try:
+                vertices = []
+                for path in ((contours.collections[i].get_paths())[0].vertices):
+                    vertices.append([path[0]*10, path[1]*10])
 
-            polygon = CustomPolygon(vertices=vertices, color=color_mapping[i], transparency=0.5)
-            
-            polygon.move(100, 100)
-            answers.append(polygon)
+                polygon = CustomPolygon(vertices=vertices, color=color_mapping[i], transparency=0.5)
+                
+                polygon.move(100, 100)
+                answers.append(polygon)
+            except:
+                pass
         if self.previous_contours:
             for contour in self.previous_contours:
                 self.graph.remove_polygon(contour)
         
         self.previous_contours = answers
 
-        # decision_boundary_polygon.move(100, 100)
         self.graph = ShapeCollection(answers + self.graph.polygons)
         self.content = self.graph.to_svg()
 
@@ -141,20 +154,25 @@ def add():
     def stuff():
         with ui.row().style("width: 100vw; justify-content:center; text-align:center; align-items:center;"):
             ui.label("Artificial Neural Networks").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
-        with ui.row().style("width: 40vw; justify-content:left; text-align:left; align-items:left;"):
-            image = ui.interactive_image(source="/static/annsvg.svg")
-            svgcontent= ANN()
-            
-            
-            image.bind_content_from(svgcontent, 'content')
-
-        with ui.row().style("width: 100vw; justify-content:center; text-align:center; align-items:center;"):
-            with ui.column():
-                ui.button("Generate new graph", on_click=lambda: stuff.refresh())
-            with ui.column():
-                ui.button("Start training", on_click=lambda: svgcontent.start_timer())
-                ui.button("Pause training", on_click=lambda: svgcontent.stop_timer())
-                ui.button("End training", on_click=lambda: svgcontent.end_timer())        
+        with ui.row():
+            with ui.column().style("width: 40vw;"):
+                image = ui.interactive_image(source="/static/annsvg.svg")
+                svgcontent= ANN()
+                
+                
+                image.bind_content_from(svgcontent, 'content')
+            with ui.column().style("width: 40vw; "):
+                with ui.row():
+                    with ui.column():
+                        ui.button("Generate new graph", on_click=lambda: stuff.refresh()).style("font-size: 10px")
+                    with ui.column():
+                        ui.button("Start training", on_click=lambda: svgcontent.start_timer()).style("font-size: 10px")
+                        ui.button("Pause training", on_click=lambda: svgcontent.stop_timer()).style("font-size: 10px")
+                        with ui.row():
+                            ui.label("Timer speed:").style("font-size: 10px;")
+                            timer_speed_label = ui.label("1").style("font-size: 10px;").bind_text_from(svgcontent, 'timer_speed', lambda x : round(1/(x if x != None else 1), 2))
+                        timer_speed = ui.slider(min=1, max=10, step=1).style("font-size:10px; background-color:lightgrey;")
+                        timer_speed.bind_value_to(svgcontent, 'timer_speed')
         with ui.row().style("width: 100vw; justify-content:center; text-align:center; align-items:center;"):
             ui.label("Model").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
             with ui.column():

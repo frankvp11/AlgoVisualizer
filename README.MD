@@ -20,3 +20,6 @@ Todo:
    8. Breadth first search
    9.  Fast exponentation
    10. Artificial Neural Network
+       1.  Make it so that the "neural network" shows up, and show the animation of the training
+           1.  Backprop
+           2.  Forward pass
