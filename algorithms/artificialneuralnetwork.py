@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
+import asyncio
 
 from ModelMaker.graphicsSVG2.Circle import Circle
 from ModelMaker.graphicsSVG2.ShapeCollection import ShapeCollection
@@ -45,9 +46,14 @@ class ANN():
         self.content = self.graph.to_svg()
         self.previous_contours = []
         self.current_epoch = 0
-        self.timer_speed = 1
+        self.timer_speed = 0.5
         self.timer = None
         self.model_graph = ShapeCollection()
+        self.layer_1_shapes = []
+        self.layer_2_shapes = []
+        self.layer_3_shapes = []
+        self.layer_4_shapes = []
+        self.stage = "forward"
         self.create_model_graphic()
 
     def get_points(self):
@@ -65,8 +71,8 @@ class ANN():
     
     def start_timer(self):
         if self.timer_speed == None:
-            self.timer_speed = 1
-        self.timer = ui.timer(interval=(1 / self.timer_speed), callback=self.run_epoch)
+            self.timer_speed = 0.5
+        self.timer = ui.timer(interval=self.timer_speed, callback=self.run_epoch)
 
     def stop_timer(self):
         if self.timer == None:
@@ -83,16 +89,99 @@ class ANN():
         self.timer.cancel()
 
     def run_epoch(self):
+        self.go_forward()
         self.current_epoch += 1
         self.optimizer.zero_grad()
-        y_pred = self.model(self.X)
-        self.loss = self.loss_function(y_pred, self.y)
-        self.loss.backward()
+        output = self.model(self.X)
+        loss = self.loss_function(output, self.y)
+        loss.backward()
         self.optimizer.step()
-        self.loss = self.loss.item()
+        self.loss = loss.item()
         self.update_boundaries()
-        return self.loss
+        self.content = self.graph.to_svg()
+        self.model_graph_image = self.model_graph.to_svg()
+        if self.loss < 0.01:
+            self.end_timer()
+            print("Training complete")
+        print("Running epoch", self.current_epoch)
 
+    def go_forward(self):
+        def layer1():
+            for index in range(len(self.layer_1_shapes)):
+                self.model_graph.run_method(self.layer_1_shapes[index], "set_color", "red")
+            self.model_graph_image = self.model_graph.to_svg()
+            
+        def layer2():
+            for index in range(len(self.layer_1_shapes)):
+                self.model_graph.run_method(self.layer_1_shapes[index], "set_color", "black")
+            for index in range(len(self.layer_2_shapes)):
+                self.model_graph.run_method(self.layer_2_shapes[index], "set_color", "red")
+            self.model_graph_image = self.model_graph.to_svg()
+
+        def layer3():
+            for index in range(len(self.layer_2_shapes)):
+                self.model_graph.run_method(self.layer_2_shapes[index], "set_color", "black")
+            for index in range(len(self.layer_3_shapes)):
+                self.model_graph.run_method(self.layer_3_shapes[index], "set_color", "red")
+            self.model_graph_image = self.model_graph.to_svg()   
+
+
+        def layer4():
+            for index in range(len(self.layer_3_shapes)):
+                self.model_graph.run_method(self.layer_3_shapes[index], "set_color", "black")
+            for index in range(len(self.layer_4_shapes)):
+                self.model_graph.run_method(self.layer_4_shapes[index], "set_color", "red")
+            self.model_graph_image = self.model_graph.to_svg()
+
+        def layer5():
+            for index in range(len(self.layer_4_shapes)):
+                self.model_graph.run_method(self.layer_4_shapes[index], "set_color", "black")
+            self.model_graph_image = self.model_graph.to_svg()
+            self.stage = "backward"
+
+
+
+        
+        def layer6():
+            for index in range(len(self.layer_4_shapes)):
+                self.model_graph.run_method(self.layer_4_shapes[index], "set_color", "red")
+            self.model_graph_image = self.model_graph.to_svg()
+        def layer7():
+            for index in range(len(self.layer_4_shapes)):
+                self.model_graph.run_method(self.layer_4_shapes[index], "set_color", "black")
+            for index in range(len(self.layer_3_shapes)):
+                self.model_graph.run_method(self.layer_3_shapes[index], "set_color", "red")
+            self.model_graph_image = self.model_graph.to_svg()
+        def layer8():
+            for index in range(len(self.layer_3_shapes)):
+                self.model_graph.run_method(self.layer_3_shapes[index], "set_color", "black")
+            for index in range(len(self.layer_2_shapes)):
+                self.model_graph.run_method(self.layer_2_shapes[index], "set_color", "red")
+            self.model_graph_image = self.model_graph.to_svg()
+        def layer9():
+            for index in range(len(self.layer_2_shapes)):
+                self.model_graph.run_method(self.layer_2_shapes[index], "set_color", "black")
+            for index in range(len(self.layer_1_shapes)):
+                self.model_graph.run_method(self.layer_1_shapes[index], "set_color", "red")
+            self.model_graph_image = self.model_graph.to_svg()
+        def layer10():
+            for index in range(len(self.layer_1_shapes)):
+                self.model_graph.run_method(self.layer_1_shapes[index], "set_color", "black")
+            self.model_graph_image = self.model_graph.to_svg()
+
+        self.stage = "forward"
+        ui.timer(interval=0.05, callback=layer1, once=True)
+        ui.timer(interval=2 * self.timer_speed / 10, callback=layer2, once=True)
+        ui.timer(interval=3 * self.timer_speed / 10 ,callback=layer3, once=True)
+        ui.timer(interval=4 * self.timer_speed / 10, callback=layer4, once=True)
+        ui.timer(interval=5  *self.timer_speed / 10, callback=layer5, once=True)
+        ui.timer(interval=6 * self.timer_speed / 10, callback=layer6, once=True)
+        ui.timer(interval=7 * self.timer_speed / 10, callback=layer7, once=True)
+        ui.timer(interval=8 * self.timer_speed / 10, callback=layer8, once=True)
+        ui.timer(interval=9 * self.timer_speed / 10, callback=layer9, once=True)
+        ui.timer(interval=10 * self.timer_speed / 10, callback=layer10, once=True)
+
+        
 
     def generate_graph(self):
         points = []
@@ -146,13 +235,6 @@ class ANN():
 
 
     def create_model_graphic(self):
-        # print(self.model.fc1.in_features)
-        print(self.model.fc1.out_features)
-        print(self.model.fc2.out_features)
-        print(self.model.fc3.out_features)
-        # circle = Circle(100, 100, 10, color="black")
-        # shapes = ShapeCollection([circle])
-        ## input layer:
         self.model_graph = ShapeCollection([Text("", 75, 50, color="black", size=10)])
         self.model_graph_image = self.model_graph.to_svg()
 
@@ -161,33 +243,44 @@ class ANN():
         positions = [i*space_each for i in range(1, self.model.fc1.out_features+1)] 
 
         for i in range(self.model.fc1.in_features):
-            self.model_graph.add_polygon(Circle(25, positions[i], 10, color="black"))
+            circ = Circle(25, positions[i], 10, color="black")
+            self.layer_1_shapes.append(circ)
+            self.model_graph.add_polygon(circ)
         ## hidden layer 1
         total_height = 300-50
         space_each = total_height / (self.model.fc1.out_features+1)
         positions_2 = [i*space_each for i in range(1, self.model.fc1.out_features+1)] 
 
         for i in range(self.model.fc1.out_features):
-            self.model_graph.add_polygon(Circle(100, positions_2[i], 10, color="black"))
+            circ = Circle(100, positions_2[i], 10, color="black")
+            self.layer_2_shapes.append(circ)
+            self.model_graph.add_polygon(circ)
 
         ## hidden layer 2
         total_height = 300-50
         space_each = total_height / (self.model.fc2.out_features+1)
         positions_3 = [i*space_each for i in range(1, self.model.fc2.out_features+1)]
         for i in range(self.model.fc2.out_features):
-            self.model_graph.add_polygon(Circle(175, positions_3[i], 10, color="black"))
+            circl = Circle(175, positions_3[i], 10, color="black")
+            self.layer_3_shapes.append(circl)
+            self.model_graph.add_polygon(circl)
+
         
         ## output layer
         total_height = 300-50
         space_each = total_height / (self.model.fc3.out_features+1)
         positions_4 = [i*space_each for i in range(1, self.model.fc3.out_features+1)]
         for i in range(self.model.fc3.out_features):
-            self.model_graph.add_polygon(Circle(250, positions_4[i], 10, color="black"))
+            circl = Circle(250, positions_4[i], 10, color="black")
+            self.layer_4_shapes.append(circl)
+            self.model_graph.add_polygon(circl)
         
         ## connect the layers
         for i in range(self.model.fc1.in_features):
             for j in range(self.model.fc1.out_features):
-                self.model_graph.add_polygon(Arrow(25, positions[i], 100, positions_2[j]))
+                arr = Arrow(25, positions[i], 100, positions_2[j],  color="black")
+                # arr.move_all(0, 100)
+                self.model_graph.add_polygon(arr)
         for i in range(self.model.fc1.out_features):
             for j in range(self.model.fc2.out_features):
                 self.model_graph.add_polygon(Arrow(100, positions_2[i], 175, positions_3[j]))
@@ -219,14 +312,14 @@ def add():
             with ui.column().style("width: 20vw; "):
                 with ui.row():
                     with ui.column():
-                        ui.button("Generate new graph", on_click=lambda: stuff.refresh()).style("font-size: 10px")
+                        ui.button("Generate new graph", on_click=lambda: (stuff.refresh()).style("font-size: 10px"))
                     with ui.column():
                         ui.button("Start training", on_click=lambda: svgcontent.start_timer()).style("font-size: 10px")
-                        ui.button("Pause training", on_click=lambda: svgcontent.stop_timer()).style("font-size: 10px")
+                        ui.button("Pause training", on_click=lambda: svgcontent.end_timer()).style("font-size: 10px")
                         with ui.row():
                             ui.label("Timer speed:").style("font-size: 10px;")
-                            timer_speed_label = ui.label("1").style("font-size: 10px;").bind_text_from(svgcontent, 'timer_speed', lambda x : round(1/(x if x != None else 1), 2))
-                        timer_speed = ui.slider(min=1, max=10, step=1).style("font-size:10px; background-color:lightgrey;")
+                            timer_speed_label = ui.label("1").style("font-size: 10px;").bind_text_from(svgcontent, 'timer_speed', lambda x : round((x if x != None else 0.5), 2))
+                        timer_speed = ui.slider(min=0.1, max=10, step=0.1).style("font-size:10px; background-color:lightgrey;")
                         timer_speed.bind_value_to(svgcontent, 'timer_speed')
             def handle_layer_1_size_change(value, ann):
                 print("Updating layer 1 size", value)
@@ -267,8 +360,11 @@ def add():
                 ui.input("Hidden layer 2 size: ", value=4,  on_change=lambda e: handle_layer_2_size_change(e.value, svgcontent)).style("font-size: 10px;")
             with ui.column():
                 ## show the modele here
-                model_image = ui.interactive_image("/static/annsvg2.svg").style("width: 400px; height: 400px;")
-                model_image.bind_content_from(svgcontent, 'model_graph_image')
+                with ui.column():
+                    ui.label().bind_text_from(svgcontent, 'stage')
+                with ui.column():
+                    model_image = ui.interactive_image("/static/annsvg2.svg").style("width: 400px; height: 400px;")
+                    model_image.bind_content_from(svgcontent, 'model_graph_image')
 
         with ui.row().style("width: 100vw; justify-content:center; text-align:center; align-items:center;"):
             ui.label("Model").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
