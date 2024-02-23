@@ -108,34 +108,35 @@ class ANN():
     def go_forward(self):
         def layer1():
             for index in range(len(self.layer_1_shapes)):
-                self.model_graph.run_method(self.layer_1_shapes[index], "set_color", "red")
+                self.layer_1_shapes[index].set_color("red")
+                # self.model_graph.run_method(self.layer_1_shapes[index], "set_color", "red")
             self.model_graph_image = self.model_graph.to_svg()
             
         def layer2():
             for index in range(len(self.layer_1_shapes)):
-                self.model_graph.run_method(self.layer_1_shapes[index], "set_color", "black")
+                self.layer_1_shapes[index].set_color("black")
             for index in range(len(self.layer_2_shapes)):
-                self.model_graph.run_method(self.layer_2_shapes[index], "set_color", "red")
+                self.layer_2_shapes[index].set_color("red")
             self.model_graph_image = self.model_graph.to_svg()
 
         def layer3():
             for index in range(len(self.layer_2_shapes)):
-                self.model_graph.run_method(self.layer_2_shapes[index], "set_color", "black")
+                self.layer_2_shapes[index].set_color("black")
             for index in range(len(self.layer_3_shapes)):
-                self.model_graph.run_method(self.layer_3_shapes[index], "set_color", "red")
+                self.layer_3_shapes[index].set_color("red")
             self.model_graph_image = self.model_graph.to_svg()   
 
 
         def layer4():
             for index in range(len(self.layer_3_shapes)):
-                self.model_graph.run_method(self.layer_3_shapes[index], "set_color", "black")
+                self.layer_3_shapes[index].set_color("black")
             for index in range(len(self.layer_4_shapes)):
-                self.model_graph.run_method(self.layer_4_shapes[index], "set_color", "red")
+                self.layer_4_shapes[index].set_color("red")
             self.model_graph_image = self.model_graph.to_svg()
 
         def layer5():
             for index in range(len(self.layer_4_shapes)):
-                self.model_graph.run_method(self.layer_4_shapes[index], "set_color", "black")
+                self.layer_4_shapes[index].set_color("black")
             self.model_graph_image = self.model_graph.to_svg()
             self.stage = "backward"
 
@@ -144,29 +145,29 @@ class ANN():
         
         def layer6():
             for index in range(len(self.layer_4_shapes)):
-                self.model_graph.run_method(self.layer_4_shapes[index], "set_color", "red")
+                self.layer_4_shapes[index].set_color("red")
             self.model_graph_image = self.model_graph.to_svg()
         def layer7():
             for index in range(len(self.layer_4_shapes)):
-                self.model_graph.run_method(self.layer_4_shapes[index], "set_color", "black")
+                self.layer_4_shapes[index].set_color("black")
             for index in range(len(self.layer_3_shapes)):
-                self.model_graph.run_method(self.layer_3_shapes[index], "set_color", "red")
+                self.layer_3_shapes[index].set_color("red")
             self.model_graph_image = self.model_graph.to_svg()
         def layer8():
             for index in range(len(self.layer_3_shapes)):
-                self.model_graph.run_method(self.layer_3_shapes[index], "set_color", "black")
+                self.layer_3_shapes[index].set_color("black")
             for index in range(len(self.layer_2_shapes)):
-                self.model_graph.run_method(self.layer_2_shapes[index], "set_color", "red")
+                self.layer_2_shapes[index].set_color("red")
             self.model_graph_image = self.model_graph.to_svg()
         def layer9():
             for index in range(len(self.layer_2_shapes)):
-                self.model_graph.run_method(self.layer_2_shapes[index], "set_color", "black")
+                self.layer_2_shapes[index].set_color("black")
             for index in range(len(self.layer_1_shapes)):
-                self.model_graph.run_method(self.layer_1_shapes[index], "set_color", "red")
+                self.layer_1_shapes[index].set_color("red")
             self.model_graph_image = self.model_graph.to_svg()
         def layer10():
             for index in range(len(self.layer_1_shapes)):
-                self.model_graph.run_method(self.layer_1_shapes[index], "set_color", "black")
+                self.layer_1_shapes[index].set_color("black")
             self.model_graph_image = self.model_graph.to_svg()
 
         self.stage = "forward"
