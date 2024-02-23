@@ -12,7 +12,7 @@ class BinaryTree:
         self.value = value
         self.left = None
         self.right = None
-        self.polygon = [Circle.Circle(x, y, 10), Text.Text(str(value), x, y-20, "black", 10), Text.Text("", x-20, y-20, "red", 10)]
+        self.polygon = [Circle.Circle(x, y, 10), Text.Text(str(value), x, y-20, color="black", fontsize=10), Text.Text("", x-20, y-20, color="red", fontsize=10)]
         self.x = x
         self.y = y
 
@@ -26,7 +26,7 @@ class BinaryTree:
                 start_y  = 0.9 * (y - (y+50)) + (y+50)
                 arrow = Arrow.Arrow(start_x, start_y, new_x, new_y)
                 
-                self.left.polygon.append(arrow)
+                self.left.polygon.extend(arrow.polygons)
             else:
                 self.left.insert(value, x-50, y+50)
         else:
@@ -37,7 +37,7 @@ class BinaryTree:
                 start_x  = 0.9 * (x - (x+50)) + (x+50)
                 start_y  = 0.9 * (y - (y+50)) + (y+50)
                 arrow = Arrow.Arrow(start_x, start_y, new_x, new_y)
-                self.right.polygon.append(arrow)
+                self.right.polygon.extend(arrow.polygons)
             else:
                 self.right.insert(value, x+50, y+50)
 
@@ -54,7 +54,6 @@ class SVGContent():
 
     def update_polygons(self, polygon, color='red'):
         self.polygons.polygons[self.polygons.polygons.index(polygon)].set_color(color)
-        # self.polygons.polygons[index].set_color(color)
         self.content = self.polygons.to_svg()
 
     def start_timer(self, tree):
@@ -73,7 +72,6 @@ class SVGContent():
             self.update_polygons(steps[index[0]][0].polygon[0], 'red')
             self.update_polygons(steps[index[0]-1][0].polygon[0], 'black')
             
-            # step[0].polygon[0].set_color('red')
             self.current_depth = steps[index[0]][1]
             self.current_root = steps[index[0]][0].value
             self.max_depth = max(self.max_depth, steps[index[0]][1])

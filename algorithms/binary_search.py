@@ -28,9 +28,9 @@ def make_row_of_numbers(numbers):
     textboxes = []
 
     for i in range(len(numbers)):
-        rect = Rectangle.Rectangle(i*50, 0, 50, 50, "lightgray")
+        rect = Rectangle.Rectangle(i*50, 0, 50, 50, color="lightgray")
         rect.give_outline("black", 2)
-        t = Text.Text(str(numbers[i]), i*50+15, 35  ,  "black", 20)
+        t = Text.Text(str(numbers[i]), i*50+15, 35  ,  color="black", fontsize=20)
         rectangles.append(rect)
         textboxes.append(t)
     collection = ShapeCollection.ShapeCollection(rectangles + textboxes)

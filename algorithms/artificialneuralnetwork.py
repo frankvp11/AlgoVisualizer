@@ -89,7 +89,9 @@ class ANN():
         self.timer.cancel()
 
     def run_epoch(self):
-        self.go_forward()
+        if self.timer_speed > 2:
+            self.go_forward()
+        
         self.current_epoch += 1
         self.optimizer.zero_grad()
         output = self.model(self.X)
@@ -109,7 +111,6 @@ class ANN():
         def layer1():
             for index in range(len(self.layer_1_shapes)):
                 self.layer_1_shapes[index].set_color("red")
-                # self.model_graph.run_method(self.layer_1_shapes[index], "set_color", "red")
             self.model_graph_image = self.model_graph.to_svg()
             
         def layer2():
@@ -322,6 +323,7 @@ def add():
                             timer_speed_label = ui.label("1").style("font-size: 10px;").bind_text_from(svgcontent, 'timer_speed', lambda x : round((x if x != None else 0.5), 2))
                         timer_speed = ui.slider(min=0.1, max=10, step=0.1).style("font-size:10px; background-color:lightgrey;")
                         timer_speed.bind_value_to(svgcontent, 'timer_speed')
+                        
             def handle_layer_1_size_change(value, ann):
                 print("Updating layer 1 size", value)
                 try:
