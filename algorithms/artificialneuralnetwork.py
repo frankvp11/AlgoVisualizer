@@ -8,6 +8,9 @@ import numpy as np
 from ModelMaker.graphicsSVG2.Circle import Circle
 from ModelMaker.graphicsSVG2.ShapeCollection import ShapeCollection
 from ModelMaker.graphicsSVG2.CustomPolygon import CustomPolygon
+from ModelMaker.graphicsSVG2.Text import Text
+from ModelMaker.graphicsSVG2.Arrow import Arrow
+
 
 import matplotlib.pyplot as plt
 rng = np.random.RandomState(1311)
@@ -31,9 +34,9 @@ class SimpleModel(nn.Module):
         return x
 
 class ANN():
-    def __init__(self):
+    def __init__(self, input_size=2, hidden_size1=4, hidden_size2=4, output_size=3):
         self.X, self.y = self.get_points()
-        self.model = SimpleModel(2, 4, 4, 3)
+        self.model = SimpleModel(input_size, hidden_size1, hidden_size2, output_size)
         self.loss_function = nn.CrossEntropyLoss()
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=0.01)
         self.loss = 0
@@ -44,6 +47,8 @@ class ANN():
         self.current_epoch = 0
         self.timer_speed = 1
         self.timer = None
+        self.model_graph = ShapeCollection()
+        self.create_model_graphic()
 
     def get_points(self):
         centers = [[-2.5, -2.5], [1.5, -1.5], [2.5, 2.5]]
@@ -136,13 +141,63 @@ class ANN():
         self.graph = ShapeCollection(answers + self.graph.polygons)
         self.content = self.graph.to_svg()
 
-def run_epoch(model, loss_function, optimizer, X, y):
-    optimizer.zero_grad()
-    y_pred = model(X)
-    loss = loss_function(y_pred, y)
-    loss.backward()
-    optimizer.step()
-    return loss.item()
+
+
+
+
+    def create_model_graphic(self):
+        # print(self.model.fc1.in_features)
+        print(self.model.fc1.out_features)
+        print(self.model.fc2.out_features)
+        print(self.model.fc3.out_features)
+        # circle = Circle(100, 100, 10, color="black")
+        # shapes = ShapeCollection([circle])
+        ## input layer:
+        self.model_graph = ShapeCollection([Text("", 75, 50, color="black", size=10)])
+        self.model_graph_image = self.model_graph.to_svg()
+
+        total_height = 300-50
+        space_each = total_height / (self.model.fc1.in_features+1)
+        positions = [i*space_each for i in range(1, self.model.fc1.out_features+1)] 
+
+        for i in range(self.model.fc1.in_features):
+            self.model_graph.add_polygon(Circle(25, positions[i], 10, color="black"))
+        ## hidden layer 1
+        total_height = 300-50
+        space_each = total_height / (self.model.fc1.out_features+1)
+        positions_2 = [i*space_each for i in range(1, self.model.fc1.out_features+1)] 
+
+        for i in range(self.model.fc1.out_features):
+            self.model_graph.add_polygon(Circle(100, positions_2[i], 10, color="black"))
+
+        ## hidden layer 2
+        total_height = 300-50
+        space_each = total_height / (self.model.fc2.out_features+1)
+        positions_3 = [i*space_each for i in range(1, self.model.fc2.out_features+1)]
+        for i in range(self.model.fc2.out_features):
+            self.model_graph.add_polygon(Circle(175, positions_3[i], 10, color="black"))
+        
+        ## output layer
+        total_height = 300-50
+        space_each = total_height / (self.model.fc3.out_features+1)
+        positions_4 = [i*space_each for i in range(1, self.model.fc3.out_features+1)]
+        for i in range(self.model.fc3.out_features):
+            self.model_graph.add_polygon(Circle(250, positions_4[i], 10, color="black"))
+        
+        ## connect the layers
+        for i in range(self.model.fc1.in_features):
+            for j in range(self.model.fc1.out_features):
+                self.model_graph.add_polygon(Arrow(25, positions[i], 100, positions_2[j]))
+        for i in range(self.model.fc1.out_features):
+            for j in range(self.model.fc2.out_features):
+                self.model_graph.add_polygon(Arrow(100, positions_2[i], 175, positions_3[j]))
+        for i in range(self.model.fc2.out_features):
+            for j in range(self.model.fc3.out_features):
+                self.model_graph.add_polygon(Arrow(175, positions_3[i], 250, positions_4[j]))
+
+        self.model_graph_image = self.model_graph.to_svg()
+
+
 
 def add():
     with ui.header():
@@ -155,13 +210,13 @@ def add():
         with ui.row().style("width: 100vw; justify-content:center; text-align:center; align-items:center;"):
             ui.label("Artificial Neural Networks").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
         with ui.row():
-            with ui.column().style("width: 40vw;"):
+            with ui.column().style("width: 300px; height: 300px;"):
                 image = ui.interactive_image(source="/static/annsvg.svg")
                 svgcontent= ANN()
                 
                 
                 image.bind_content_from(svgcontent, 'content')
-            with ui.column().style("width: 40vw; "):
+            with ui.column().style("width: 20vw; "):
                 with ui.row():
                     with ui.column():
                         ui.button("Generate new graph", on_click=lambda: stuff.refresh()).style("font-size: 10px")
@@ -173,6 +228,48 @@ def add():
                             timer_speed_label = ui.label("1").style("font-size: 10px;").bind_text_from(svgcontent, 'timer_speed', lambda x : round(1/(x if x != None else 1), 2))
                         timer_speed = ui.slider(min=1, max=10, step=1).style("font-size:10px; background-color:lightgrey;")
                         timer_speed.bind_value_to(svgcontent, 'timer_speed')
+            def handle_layer_1_size_change(value, ann):
+                print("Updating layer 1 size", value)
+                try:
+                    value = int(value)
+                except ValueError:
+                    value = 4
+                if (value) == 0:
+                    value = 1
+                ann.model.fc1 = nn.Linear(2, value)
+                ann.model.fc2 = nn.Linear(value, ann.model.fc2.out_features)
+                ann.create_model_graphic()
+
+
+            def handle_layer_2_size_change(value, ann):
+                print("Updating layer 2 size", value)
+                try:
+                    value = int(value)
+                except ValueError:
+                    value = 4
+                if (value) == 0:
+                    value = 1
+                ann.model.fc2 = nn.Linear(ann.model.fc1.out_features, value)
+                ann.model.fc3 = nn.Linear(value, ann.model.fc3.out_features)
+                ann.create_model_graphic()
+            
+
+            def handle_lr_change(value, ann):
+                value = float(value)
+                if (value) == 0:
+                    value = 0.0001
+                print("Updating learning rate", value)
+                ann.optimizer = torch.optim.Adam(ann.model.parameters(), lr=value)
+                
+            with ui.column().style("width: 10vw;"):
+                ui.input("Learning rate: ", value=0.001, on_change=lambda e : handle_lr_change(e.value, svgcontent)).style("font-size: 10px;")
+                ui.input("Hidden layer 1 size: ", value=4,  on_change=lambda e: handle_layer_1_size_change(e.value, svgcontent)).style("font-size: 10px;")
+                ui.input("Hidden layer 2 size: ", value=4,  on_change=lambda e: handle_layer_2_size_change(e.value, svgcontent)).style("font-size: 10px;")
+            with ui.column():
+                ## show the modele here
+                model_image = ui.interactive_image("/static/annsvg2.svg").style("width: 400px; height: 400px;")
+                model_image.bind_content_from(svgcontent, 'model_graph_image')
+
         with ui.row().style("width: 100vw; justify-content:center; text-align:center; align-items:center;"):
             ui.label("Model").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
             with ui.column():
