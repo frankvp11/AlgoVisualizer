@@ -40,6 +40,7 @@ class ANN():
         self.graph = self.generate_graph()
         self.graph.move_all(100, 100)
         self.content = self.graph.to_svg()
+        self.previous_contours = []
 
 
     def get_points(self):
@@ -52,6 +53,7 @@ class ANN():
         y = y + noise_y
         X = torch.tensor(X, dtype=torch.float32)
         y = torch.tensor(y, dtype=torch.long)
+        # print(X, y)
         return X, y
     
     def run_epoch(self):
@@ -76,19 +78,38 @@ class ANN():
         X = self.X.detach().numpy()
         y = self.y.detach().numpy()
         model = self.model
+        ## Figure out a way to ge tthe polygons
+        ## Current idea:
+        ##  Take the Z values from the model
+        ##  Then "put them together" wit hthe x and y values
+        ##  and then use the vertices to create a polygon
 
         x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
         y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
         xx, yy = np.meshgrid(np.arange(x_min, x_max, 0.1), np.arange(y_min, y_max, 0.1))
         temp = torch.tensor(np.c_[xx.ravel(), yy.ravel()], dtype=torch.float32)
+        # print(temp)
         Z = model(temp)
-        Z = Z.reshape(xx.shape)
+        Z = Z.detach().numpy()
+        Z = np.argmax(Z, axis=1)
+        Z = Z.reshape(xx.shape)        
+        contours = plt.contourf(xx, yy, Z, alpha=0.5, colors=['red', 'blue', 'green'])
+        answers = []
+        for i in range(1): # len(contours.collections)
+            # answers.append(contours.collections[i].get_paths())
+            vertices = []
+            for path in ((contours.collections[i].get_paths())[0].vertices):
+                vertices.append([path[0]*10, path[1]*10])
 
-
+            polygon = CustomPolygon(vertices=vertices, color="red", transparency=0.5)
+            
+            polygon.move(100, 100)
+            answers.append(polygon)
+        # print(answers[0][0].vertices)
         # Plot the decision boundary
-        decision_boundary_polygon = CustomPolygon(vertices=np.c_[xx.ravel(), yy.ravel()], color='blue', transparency=0.5)
-        decision_boundary_polygon.move(100, 100)
-        self.graph = ShapeCollection([decision_boundary_polygon] + self.graph.polygons)
+        
+        # decision_boundary_polygon.move(100, 100)
+        self.graph = ShapeCollection(answers + self.graph.polygons)
         self.content = self.graph.to_svg()
 
 def run_epoch(model, loss_function, optimizer, X, y):
