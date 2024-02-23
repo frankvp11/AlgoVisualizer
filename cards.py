@@ -2,7 +2,7 @@ from nicegui import ui, app, APIRouter
 import algorithms.depth_of_binary_tree
 import algorithms.dijkstras
 import algorithms.binary_search
-
+import algorithms.artificialneuralnetwork
 router = APIRouter(prefix='/algorithms')
 
 app.include_router(router)
@@ -16,9 +16,9 @@ app.include_router(router)
 
 
 def add():
-    pages = ["Depth of Binary Tree", "Dijkstras", "Binary Search"]
-    icons = ["/static/binarytree.png", "/static/dijkstras.png", "/static/binsearch.png"]
-    targets = ["depth_of_binary_tree", "dijkstras", "binary_search"]
+    pages = ["Depth of Binary Tree", "Dijkstras", "Binary Search", 'Artificial Neural Network']
+    icons = ["/static/binarytree.png", "/static/dijkstras.png", "/static/binsearch.png", '/static/ann.png']
+    targets = ["depth_of_binary_tree", "dijkstras", "binary_search", 'artificialneuralnetwork']
     with ui.row():
         for i in range(len(pages)):
             with ui.link(
@@ -42,4 +42,7 @@ def main():
 def main():
     algorithms.binary_search.add()
 
+@ui.page('/algorithms/artificialneuralnetwork')
+def main():
+    algorithms.artificialneuralnetwork.add()
 
