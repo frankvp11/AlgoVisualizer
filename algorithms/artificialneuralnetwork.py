@@ -9,6 +9,7 @@ from ModelMaker.graphicsSVG2.Circle import Circle
 from ModelMaker.graphicsSVG2.ShapeCollection import ShapeCollection
 from ModelMaker.graphicsSVG2.CustomPolygon import CustomPolygon
 
+import matplotlib.pyplot as plt
 rng = np.random.RandomState(1311)
 
 from sklearn.datasets import make_blobs
@@ -60,6 +61,7 @@ class ANN():
         self.loss.backward()
         self.optimizer.step()
         self.loss = self.loss.item()
+        self.update_boundaries()
         return self.loss
 
 
@@ -69,14 +71,25 @@ class ANN():
         for (x, x2), color in zip(self.X, self.y):
             points.append(Circle(x.item()*10, x2.item()*10, 1, color=color_mapping[color.item()])) 
         return ShapeCollection(points)
+    
     def update_boundaries(self):
-        x_min, x_max = self.X[:, 0].min() - 1, self.X[:, 0].max() + 1
-        y_min, y_max = self.X[:, 1].min() - 1, self.X[:, 1].max() + 1
-        xx, yy = np.meshgrid(np.arange(x_min, x_max, 0.1), np.arange(y_min, y_max, 0.1))
-        Z = self.model(np.c_[xx.ravel(), yy.ravel()])
-        Z = Z.reshape(xx.shape)
-        decision_boundary_polygon = CustomPolygon(vertices=np.c_[xx.ravel(), yy.ravel()], color='blue')
+        X = self.X.detach().numpy()
+        y = self.y.detach().numpy()
+        model = self.model
 
+        x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
+        y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
+        xx, yy = np.meshgrid(np.arange(x_min, x_max, 0.1), np.arange(y_min, y_max, 0.1))
+        temp = torch.tensor(np.c_[xx.ravel(), yy.ravel()], dtype=torch.float32)
+        Z = model(temp)
+        Z = Z.reshape(xx.shape)
+
+
+        # Plot the decision boundary
+        decision_boundary_polygon = CustomPolygon(vertices=np.c_[xx.ravel(), yy.ravel()], color='blue', transparency=0.5)
+        decision_boundary_polygon.move(100, 100)
+        self.graph = ShapeCollection([decision_boundary_polygon] + self.graph.polygons)
+        self.content = self.graph.to_svg()
 
 def run_epoch(model, loss_function, optimizer, X, y):
     optimizer.zero_grad()
