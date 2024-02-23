@@ -41,7 +41,7 @@ class ANN():
         self.graph.move_all(100, 100)
         self.content = self.graph.to_svg()
         self.previous_contours = []
-
+        self.current_epoch = 0
 
     def get_points(self):
         centers = [[-2.5, -2.5], [1.5, -1.5], [2.5, 2.5]]
@@ -53,10 +53,19 @@ class ANN():
         y = y + noise_y
         X = torch.tensor(X, dtype=torch.float32)
         y = torch.tensor(y, dtype=torch.long)
-        # print(X, y)
+
         return X, y
     
+    def start_timer(self):
+        self.timer = ui.timer(interval=1, callback=self.run_epoch)
+
+    def stop_timer(self):
+        self.timer.deactivate()
+    def end_timer(self):
+        self.timer.cancel()
+
     def run_epoch(self):
+        self.current_epoch += 1
         self.optimizer.zero_grad()
         y_pred = self.model(self.X)
         self.loss = self.loss_function(y_pred, self.y)
@@ -78,11 +87,7 @@ class ANN():
         X = self.X.detach().numpy()
         y = self.y.detach().numpy()
         model = self.model
-        ## Figure out a way to ge tthe polygons
-        ## Current idea:
-        ##  Take the Z values from the model
-        ##  Then "put them together" wit hthe x and y values
-        ##  and then use the vertices to create a polygon
+        color_mapping = {0: "red", 1: "blue", 2: "green"}
 
         x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
         y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
@@ -93,21 +98,27 @@ class ANN():
         Z = Z.detach().numpy()
         Z = np.argmax(Z, axis=1)
         Z = Z.reshape(xx.shape)        
-        contours = plt.contourf(xx, yy, Z, alpha=0.5, colors=['red', 'blue', 'green'])
+        
+        contours = plt.contourf(xx, yy, Z, alpha=0.5, levels=2)
         answers = []
-        for i in range(1): # len(contours.collections)
-            # answers.append(contours.collections[i].get_paths())
+        for i in range(len(contours.collections)): # 
+            print(i)
+            
+            
             vertices = []
             for path in ((contours.collections[i].get_paths())[0].vertices):
                 vertices.append([path[0]*10, path[1]*10])
 
-            polygon = CustomPolygon(vertices=vertices, color="red", transparency=0.5)
+            polygon = CustomPolygon(vertices=vertices, color=color_mapping[i], transparency=0.5)
             
             polygon.move(100, 100)
             answers.append(polygon)
-        # print(answers[0][0].vertices)
-        # Plot the decision boundary
+        if self.previous_contours:
+            for contour in self.previous_contours:
+                self.graph.remove_polygon(contour)
         
+        self.previous_contours = answers
+
         # decision_boundary_polygon.move(100, 100)
         self.graph = ShapeCollection(answers + self.graph.polygons)
         self.content = self.graph.to_svg()
@@ -130,8 +141,7 @@ def add():
     def stuff():
         with ui.row().style("width: 100vw; justify-content:center; text-align:center; align-items:center;"):
             ui.label("Artificial Neural Networks").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
-        with ui.row().style("width: 100vw; justify-content:center; text-align:center; align-items:center;"):
-            ui.label("Data").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
+        with ui.row().style("width: 40vw; justify-content:left; text-align:left; align-items:left;"):
             image = ui.interactive_image(source="/static/annsvg.svg")
             svgcontent= ANN()
             
@@ -139,9 +149,12 @@ def add():
             image.bind_content_from(svgcontent, 'content')
 
         with ui.row().style("width: 100vw; justify-content:center; text-align:center; align-items:center;"):
-            ui.button("Generate new graph", on_click=lambda: stuff.refresh())
-            ui.button("Train one epoch", on_click=lambda: svgcontent.run_epoch())
-
+            with ui.column():
+                ui.button("Generate new graph", on_click=lambda: stuff.refresh())
+            with ui.column():
+                ui.button("Start training", on_click=lambda: svgcontent.start_timer())
+                ui.button("Pause training", on_click=lambda: svgcontent.stop_timer())
+                ui.button("End training", on_click=lambda: svgcontent.end_timer())        
         with ui.row().style("width: 100vw; justify-content:center; text-align:center; align-items:center;"):
             ui.label("Model").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
             with ui.column():
