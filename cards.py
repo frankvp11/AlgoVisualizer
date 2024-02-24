@@ -3,6 +3,7 @@ import algorithms.depth_of_binary_tree
 import algorithms.dijkstras
 import algorithms.binary_search
 import algorithms.artificialneuralnetwork
+import algorithms.depth_first_search
 router = APIRouter(prefix='/algorithms')
 
 app.include_router(router)
@@ -16,9 +17,9 @@ app.include_router(router)
 
 
 def add():
-    pages = ["Depth of Binary Tree", "Dijkstras", "Binary Search", 'Artificial Neural Network']
-    icons = ["/static/binarytree.png", "/static/dijkstras.png", "/static/binsearch.png", '/static/ann.png']
-    targets = ["depth_of_binary_tree", "dijkstras", "binary_search", 'artificialneuralnetwork']
+    pages = ["Depth of Binary Tree", "Dijkstras", "Binary Search", 'Artificial Neural Network', "Depth First Search"]
+    icons = ["/static/binarytree.png", "/static/dijkstras.png", "/static/binsearch.png", '/static/ann.png', "/static/dfs.png"]
+    targets = ["depth_of_binary_tree", "dijkstras", "binary_search", 'artificialneuralnetwork', 'depth_first_search']
     with ui.row():
         for i in range(len(pages)):
             with ui.link(
@@ -46,3 +47,7 @@ def main():
 def main():
     algorithms.artificialneuralnetwork.add()
 
+
+@ui.page("/algorithms/depth_first_search")
+def main():
+    algorithms.depth_first_search.add()
