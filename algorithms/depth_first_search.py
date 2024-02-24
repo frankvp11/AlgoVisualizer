@@ -65,10 +65,6 @@ def add():
                 ui.button("Depth First Search", on_click=lambda e : graph2.start_timer_dfs())
                 graph2.make_svg()
                 image = ui.interactive_image("/static/dfssvg.svg").style("width: 100vw;")
-                # print("Image content before binding in depth_first_search.py")
-                # print(image.content)
                 image.bind_content_from(graph2, 'content')
-                # print("Image content after binding in depth_first_search.py")
-                # print(image.content)
 
     stuff()

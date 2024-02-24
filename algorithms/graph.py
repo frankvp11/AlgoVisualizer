@@ -23,7 +23,9 @@ class Graph:
         self.edge_polygons = []
         self.queue_polygons = []
         self.stack_polygons = []
+        self.polygons = None
         self.polygons = ShapeCollection()
+        self.polygons.clear_all_polygons()
         self.adjacency_list = kwargs.get('adjacency_list', {})
         self.content = ""
         self.queue = []
