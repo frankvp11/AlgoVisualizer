@@ -190,7 +190,7 @@ def add():
     with ui.row():
         with ui.column().style("width: 100vw; "):
             graph2.bfs_animated(graph2.nodes[0])
-            ui.button("Depth First Search", on_click=lambda e : graph2.start_timer())
+            ui.button("Breadth First Search", on_click=lambda e : graph2.start_timer())
             graph2.make_svg()
             image = ui.interactive_image("/static/bfssvg.svg").style("width: 100vw;")
             image.bind_content_from(graph2, 'content')
