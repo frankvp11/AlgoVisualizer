@@ -87,7 +87,6 @@ def add():
         3: [5],
         5: [6],
         6: [],
-        2: [6]
     }
     for key in adjaceny_list:
         graph.add_node(key)
