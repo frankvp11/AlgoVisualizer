@@ -41,6 +41,7 @@ class Graph:
         self.edges = []
         self.node_polygons = []
         self.edge_polygons = []
+        self.stack_polygons = []
         self.polygons = ShapeCollection()
         self.adjacency_list = kwargs.get('adjacency_list', {})
         self.content = ""
@@ -49,19 +50,24 @@ class Graph:
         self.previous = None
         self.done = False
         self.timer = None
-        self.stack_content = ""
     
 
     def render_stack(self):
-        shapes = ShapeCollection()
-        for node in self.stack:
-            rect = Rectangle(0, 0, 100, 50, color='lightgray', transparency=0.9)
-            rect.give_outline("black", thickness=1)
-            text = Text(node.data, 30, 40, fontsize=20)
-            shapes.add_polygon(rect)
-            shapes.add_polygon(text)
+        for polygon in self.stack_polygons:
+            self.polygons.remove_polygon(polygon)
+        stack_text_ = Text("Stack", 0, 0, fontsize=40)
+        stack_text_.scale(2)
+        stack_text_.move(250, 20)
+        self.stack_polygons = [stack_text_]
         
-        self.stack_content = shapes.to_svg()
+        for index, node in enumerate(self.stack):
+            rect = Rectangle(500, 50+50*index, 50, 50, color='lightgray', transparency=1)
+            rect.give_outline("black", thickness=1)
+            text = Text(node.data, 510, 70+50*index, fontsize=20)
+            self.stack_polygons.append(rect)
+            self.stack_polygons.append(text)
+
+        
 
     def add_node(self, data, x, y, id):
         node = Node(data, x=x, y=y, id=id)
@@ -94,7 +100,10 @@ class Graph:
         return None
 
     def make_svg(self):
-        
+        self.content = ""
+
+        for polygon in self.stack_polygons:
+            self.polygons.add_polygon(polygon)
         for polygon in self.edge_polygons:
             self.polygons.add_polygon(polygon)
         for polygon in self.node_polygons:
@@ -103,13 +112,13 @@ class Graph:
         self.content = self.polygons.to_svg()
 
     def dfs_one_call(self):
+
         if self.stack:
             current = self.stack.pop()
-            # current.circle.color = "red"
             self.polygons.polygons[self.polygons.polygons.index(current.circle)].color = "red"
             if self.previous:
                 self.polygons.polygons[self.polygons.polygons.index(self.previous.circle)].color = "lightgray"
-            self.make_svg()
+
             self.previous  = current
             for neighbor in current.neighbors:
                 if not self.visited[neighbor.data]:
@@ -117,9 +126,8 @@ class Graph:
                     self.stack.append(neighbor)
             if self.stack == []:
                 self.done = True
-                
+
         else:
-            self.make_svg()
             self.previous = None
             self.stack = []
             self.visited = [False] * 1000
@@ -135,8 +143,11 @@ class Graph:
             self.stack = [start]
             self.visited[start.data] = True
             return
-        self.dfs_one_call()
+        
         self.render_stack()
+        self.dfs_one_call()
+
+        self.make_svg()
 
     def start_timer(self):
         self.timer = ui.timer(3, self.dfs_animated)
@@ -153,7 +164,7 @@ def add():
     graph = nx.MultiGraph()
     graph2 = Graph()
     adjaceny_list = {
-        1: [2, 3],
+        1: [2, 3, 4, 5, 6],
         2: [3],
         3: [],
         4: [5],
@@ -176,17 +187,11 @@ def add():
         for val in adjaceny_list[key]:
             graph2.add_edge(key, val, id(key), id(val))
             
-    # print(len(graph2.nodes[0].polygon.polygons))
-    # print(graph2.nodes[0].polygon.polygons)
     with ui.row():
-        with ui.column().style("width: 50vw; "):
+        with ui.column().style("width: 100vw; "):
             graph2.dfs_animated(graph2.nodes[0])
             ui.button("Depth First Search", on_click=lambda e : graph2.start_timer())
             graph2.make_svg()
             image = ui.interactive_image("/static/dfssvg.svg").style("width: 100vw;")
             image.bind_content_from(graph2, 'content')
 
-        with ui.column().style("width:40vw;"):
-            ui.label("Stack:")
-            image2 = ui.interactive_image("/static/dfssvg_stack.svg").style("width: 100vw;")
-            image2.bind_content_from(graph2, 'stack_content')
