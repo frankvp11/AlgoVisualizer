@@ -20,3 +20,5 @@ class Node:
         self.circle.give_outline("black", thickness=1)
         self.text = Text(self.data, self.x, self.y, fontsize=10)
         return ShapeCollection([self.circle, self.text])
+    def __lt__(self, other):
+        return self.data < other.data

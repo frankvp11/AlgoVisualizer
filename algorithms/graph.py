@@ -1,4 +1,5 @@
 
+import heapq
 import sys
 import math
 from math import sqrt
@@ -18,9 +19,10 @@ from ModelMaker.graphicsSVG2.ShapeCollection import ShapeCollection
 class Graph:
     def __init__(self, **kwargs) -> None:
         self.nodes = []
-        self.edges = []
+        self.edges = [[0 for _ in range(100)] for _ in range(100) ]
         self.node_polygons = []
         self.edge_polygons = []
+        self.edge_polygons_weights = []
         self.queue_polygons = []
         self.stack_polygons = []
         self.polygons = None
@@ -34,7 +36,7 @@ class Graph:
         self.previous = None
         self.done = False
         self.timer = None
-    
+
     def render_stack(self):
         for polygon in self.stack_polygons:
             self.polygons.remove_polygon(polygon)
@@ -75,8 +77,8 @@ class Graph:
         self.node_polygons.append(polygon.polygons[1])  
         return node
 
-    def add_edge(self, start, end, start_id, end_id):
-        self.edges.append((start, end))
+    def add_edge(self, start, end, start_id, end_id, weight=0):
+        self.edges[start][end] = ( weight)
         start_node = self.find_node(start, start_id)
         end_node = self.find_node(end, end_id)
         dx = end_node.x - start_node.x
@@ -87,6 +89,10 @@ class Graph:
         end_intersection_x = end_node.x - (dx / distance) * 15
         end_intersection_y = end_node.y - (dy / distance) * 15        
         line = Line(start_intersection_x, start_intersection_y, end_intersection_x, end_intersection_y, color='black')
+        if weight != 0 and self.edges[end][start] == 0:
+            text = Text(str(weight), (start_intersection_x + end_intersection_x-5) / 2, (start_intersection_y + end_intersection_y-5) / 2, fontsize=20)
+            self.edge_polygons_weights.append((start, end, text))
+            self.edge_polygons.append(text)
         self.edge_polygons.append(line)
         start_node.neighbors.append(end_node)
         end_node.neighbors.append(start_node)
@@ -188,6 +194,36 @@ class Graph:
         self.make_svg()
 
 
+
+
+    def start_dijkstras(self, start, end):
+        distances = [0] * 100
+        queue = []
+        for node in self.nodes:
+            if node.data != start:
+                distances[node.data] = math.inf
+            queue.append(node.data)
+        heapq.heapify(queue)
+        print(self.adjacency_list)
+        while queue:
+            current_V = heapq.heappop(queue)
+            print("Current node: ", current_V)
+            for neighbor in self.adjacency_list[current_V]:
+                temp_distance = distances[current_V] + self.edges[current_V][neighbor]
+                print("Temp distance:  from node: ", current_V, neighbor, temp_distance)
+                if temp_distance < distances[neighbor]:
+                    distances[neighbor] = temp_distance
+
+        print("Distances")
+        print(distances[:100])
+        # print("Previous")
+        # print(previous)
+        """
+
+
+        """ 
+        
+    
 
     def start_timer_bfs(self):
         self.timer = ui.timer(3, self.bfs_animated)
