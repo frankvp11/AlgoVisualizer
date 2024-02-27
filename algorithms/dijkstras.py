@@ -44,6 +44,7 @@ def add():
         with ui.row():
             with ui.column().style("width: 100vw; "):
                 # graph2.dfs_animated(graph2.nodes[0])
+                ui.button("Reset", on_click=lambda e : stuff.refresh())
                 ui.button("Dijkstras Algorithm", on_click=lambda e : graph2.start_dijkstras(1, 9))
                 graph2.make_svg()
                 image = ui.interactive_image("/static/dfssvg.svg").style("width: 100vw;")

@@ -193,36 +193,73 @@ class Graph:
 
         self.make_svg()
 
+    def update_text_on_edge(self, start, end, weight):
+        for edge in self.edge_polygons_weights:
+            if edge[0] == start and edge[1] == end:
+                edge[2].text = weight
+                edge[2].set_color("red")
+                print("Updating weight from node: ", start, "to ",  end, " to ", weight)
+                self.make_svg()
+
+    def update_neighbor_node(self, neighbor):
+        for node in self.nodes:
+            if node.data == neighbor:
+                node.circle.color = "red"
+                node.text.color = "red"
+                self.make_svg()
+
+    def update_previous_node(self, previous):
+        for node in self.nodes:
+            if node.data == previous or node in self.previous.neighbors:
+                node.circle.color = "lightgray"
+                node.text.color = "lightgray"
+                self.make_svg()
+            
+    def update_current_node(self, current):
+
+        for node in self.nodes:
+            
+            if node.data == current.data:
+                node.circle.color = "green"
+                node.text.color = "green"
+                self.make_svg()
+            
+
+    def dijkstras_one_call(self):
+        if self.dijkstras_queue:
+            current_V_node = heapq.heappop(self.dijkstras_queue)
+            current_V = current_V_node.data
+            if self.previous:
+                self.update_previous_node(self.previous.data)
+            self.update_current_node(current_V_node)
+            for neighbor in self.adjacency_list[current_V]:
+                temp_distance = self.dijkstras_distances[current_V] + self.edges[current_V][neighbor]
+                self.update_neighbor_node(neighbor)
+                if temp_distance < self.dijkstras_distances[neighbor]:
+                    self.dijkstras_distances[neighbor] = temp_distance
+                    self.update_text_on_edge(current_V, neighbor, temp_distance)
+                    print("Updating distance from node: ", current_V, "to ",  neighbor, " to ", temp_distance)
+            self.previous = current_V_node
+
+
+            if self.dijkstras_queue == []:
+                self.timer.cancel()
+                self.update_previous_node(self.previous.data)
+                print("Dijkstras done")
+                print(self.dijkstras_distances)
 
 
 
     def start_dijkstras(self, start, end):
-        distances = [0] * 100
-        queue = []
+        self.dijkstras_distances = [0] * (max(self.adjacency_list.keys()) + 1)
+        self.dijkstras_queue = []
         for node in self.nodes:
             if node.data != start:
-                distances[node.data] = math.inf
-            queue.append(node.data)
-        heapq.heapify(queue)
-        print(self.adjacency_list)
-        while queue:
-            current_V = heapq.heappop(queue)
-            print("Current node: ", current_V)
-            for neighbor in self.adjacency_list[current_V]:
-                temp_distance = distances[current_V] + self.edges[current_V][neighbor]
-                print("Temp distance:  from node: ", current_V, neighbor, temp_distance)
-                if temp_distance < distances[neighbor]:
-                    distances[neighbor] = temp_distance
+                self.dijkstras_distances[node.data] = math.inf
+            self.dijkstras_queue.append(node)
 
-        print("Distances")
-        print(distances[:100])
-        # print("Previous")
-        # print(previous)
-        """
+        self.timer = ui.timer(3, self.dijkstras_one_call)
 
-
-        """ 
-        
     
 
     def start_timer_bfs(self):
