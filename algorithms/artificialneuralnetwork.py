@@ -55,6 +55,7 @@ class ANN():
         self.layer_4_shapes = []
         self.stage = "forward"
         self.create_model_graphic()
+        self.parameters = 0
 
     def get_points(self):
         centers = [[-2.5, -2.5], [1.5, -1.5], [2.5, 2.5]]
@@ -233,7 +234,14 @@ class ANN():
         self.content = self.graph.to_svg()
 
 
-
+    def get_n_params(self):
+        pp=0
+        for p in list(self.model.parameters()):
+            nn=1
+            for s in list(p.size()):
+                nn = nn*s
+            pp += nn
+        self.parameters = pp
 
 
     def create_model_graphic(self):
@@ -294,6 +302,41 @@ class ANN():
 
 
 
+def create_model_svg():
+    ui.markdown("""```python\n
+                import torch\n
+                import torch.nn as nn\n
+                import torch.nn.functional as F\n
+                import numpy as np\n
+
+                class SimpleModel(nn.Module):\n 
+                    def __init__(self, input_size, hidden_size1, hidden_size2, output_size):\n
+                        super(SimpleModel, self).__init__()\n
+                        self.fc1 = nn.Linear(input_size, hidden_size1)\n      
+                        self.fc2 = nn.Linear(hidden_size1, hidden_size2)\n      
+                        self.fc3 = nn.Linear(hidden_size2, output_size)\n   
+                    
+                    def forward(self, x):\n       
+                        x = F.relu(self.fc1(x))\n    
+                        x = F.relu(self.fc2(x))\n      
+                        x = self.fc3(x)\n      
+                        return x\n
+
+                model = SimpleModel(2, 4, 4, 3)\n
+                loss_function = nn.CrossEntropyLoss()\n
+                optimizer = torch.optim.Adam(model.parameters(), lr=0.01)\n
+                loss = 0\n
+                for epoch in range(1000):\n   
+                    optimizer.zero_grad()\n    
+                    output = model(X)\n   
+                    loss = loss_function(output, y)\n  
+                    loss.backward()\n    
+                    optimizer.step()\n   
+                    print(loss)\n   
+                ```""")
+    
+
+
 def add():
     with ui.header():
         with ui.link(target="/"):
@@ -334,6 +377,7 @@ def add():
                     value = 1
                 ann.model.fc1 = nn.Linear(2, value)
                 ann.model.fc2 = nn.Linear(value, ann.model.fc2.out_features)
+                ann.get_n_params()
                 ann.create_model_graphic()
 
 
@@ -347,6 +391,7 @@ def add():
                     value = 1
                 ann.model.fc2 = nn.Linear(ann.model.fc1.out_features, value)
                 ann.model.fc3 = nn.Linear(value, ann.model.fc3.out_features)
+                ann.get_n_params()
                 ann.create_model_graphic()
             
 
@@ -357,23 +402,68 @@ def add():
                 print("Updating learning rate", value)
                 ann.optimizer = torch.optim.Adam(ann.model.parameters(), lr=value)
                 
-            with ui.column().style("width: 10vw;"):
-                ui.input("Learning rate: ", value=0.001, on_change=lambda e : handle_lr_change(e.value, svgcontent)).style("font-size: 10px;")
-                ui.input("Hidden layer 1 size: ", value=4,  on_change=lambda e: handle_layer_1_size_change(e.value, svgcontent)).style("font-size: 10px;")
-                ui.input("Hidden layer 2 size: ", value=4,  on_change=lambda e: handle_layer_2_size_change(e.value, svgcontent)).style("font-size: 10px;")
-            with ui.column():
-                ## show the modele here
-                with ui.column():
-                    ui.label().bind_text_from(svgcontent, 'stage')
-                with ui.column():
-                    model_image = ui.interactive_image("/static/annsvg2.svg").style("width: 400px; height: 400px;")
-                    model_image.bind_content_from(svgcontent, 'model_graph_image')
+            with ui.row():
+                with ui.column().style("width: 10vw;"):
 
-        with ui.row().style("width: 100vw; justify-content:center; text-align:center; align-items:center;"):
-            ui.label("Model").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
-            with ui.column():
-                ui.label(f"Loss: ").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
-            with ui.column():
-                loss =ui.label("").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
-                loss.bind_text_from(svgcontent, 'loss')
+                    ui.input("Learning rate: ", value=0.001, on_change=lambda e : handle_lr_change(e.value, svgcontent)).style("font-size: 10px;")
+                    ui.input("Hidden layer 1 size: ", value=4,  on_change=lambda e: handle_layer_1_size_change(e.value, svgcontent)).style("font-size: 10px;")
+                    ui.input("Hidden layer 2 size: ", value=4,  on_change=lambda e: handle_layer_2_size_change(e.value, svgcontent)).style("font-size: 10px;")
+                with ui.column():
+                    ## show the modele here
+                    with ui.column():
+                        ui.label().bind_text_from(svgcontent, 'stage')
+                    with ui.column():
+                        model_image = ui.interactive_image("/static/annsvg2.svg").style("width: 400px; height: 400px;")
+                        model_image.bind_content_from(svgcontent, 'model_graph_image')
+                with ui.column():
+                    with ui.row():
+                        with ui.column():
+                            ui.label("Loss:").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
+                        with ui.column():
+                            loss = ui.label("").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
+                            loss.bind_text_from(svgcontent, 'loss')
+                    with ui.row():
+                        with ui.column():
+                            ui.label("Epoch:").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
+                        with ui.column():
+                            epoch = ui.label("").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
+                            epoch.bind_text_from(svgcontent, 'current_epoch')
+                    with ui.row():
+                        with ui.column():
+                            ui.label("Parameters:").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
+                        with ui.column():
+                            svgcontent.get_n_params()
+                            parameters = ui.label("").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
+                            parameters.bind_text_from(svgcontent, 'parameters')
+                    with ui.row():
+                        with ui.column():
+                            ui.label("Optimizer:").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
+                        with ui.column():
+                            optimizer = ui.label("Adam").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
+                    with ui.row():
+                        with ui.column():
+                            ui.label("Loss function:").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
+                        with ui.column():
+                            loss_function = ui.label("Cross Entropy").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
+            with ui.row().style("width: 100vw;"):
+                with ui.column():
+                    ui.label("Artificial Neural Networks (ANNs) are computational models inspired by the structure and function of biological neural networks in the human brain. They are a subset of machine learning algorithms used for tasks such as classification, regression, clustering, and pattern recognition.").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
+                with ui.column():
+                    ui.label("How ANNs Work:").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
+                    ui.label("ANNs consist of interconnected nodes arranged in layers. The three main types of layers are:").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
+                    ui.label("Input Layer: Receives input data.").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
+                    ui.label("Hidden Layers: Perform computations on the input data.").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
+                    ui.label("Output Layer: Produces the final output.").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
+                    ui.label("Each node in a layer is associated with a weight, which represents the strength of the connection between nodes. During training, the network adjusts these weights based on the input data and the desired output. This process is called backpropagation, where the error between the predicted output and the actual output is minimized using optimization algorithms such as gradient descent.").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
+            with ui.row().style("width: 100vw;"):
+                with ui.column():
+                    ui.label("So what does this model look like?").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
+                    ui.label("The model is a simple 2 layer neural network with 2 hidden layers. The input layer has 2 neurons, the first hidden layer has 4 neurons, the second hidden layer has 4 neurons, and the output layer has 3 neurons. The model is trained using the Adam optimizer and the Cross Entropy loss function.").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
+                with ui.column():
+                    ui.label("The model is trained on a dataset of 2000 points, with 3 clusters. The model is trained using the Adam optimizer and the Cross Entropy loss function.").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
+            with ui.row().style("width: 100vw;"):
+                with ui.column():
+                    ui.label("The following is the code used for this model:").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
+                    create_model_svg()
+        
     stuff()
