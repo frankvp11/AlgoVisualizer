@@ -1,4 +1,5 @@
 
+import asyncio
 import heapq
 import sys
 import math
@@ -193,26 +194,26 @@ class Graph:
 
         self.make_svg()
 
+
     def update_text_on_edge(self, start, end, weight):
         for edge in self.edge_polygons_weights:
             if edge[0] == start and edge[1] == end:
                 edge[2].text = weight
                 edge[2].set_color("red")
-                print("Updating weight from node: ", start, "to ",  end, " to ", weight)
                 self.make_svg()
 
     def update_neighbor_node(self, neighbor):
         for node in self.nodes:
             if node.data == neighbor:
                 node.circle.color = "red"
-                node.text.color = "red"
+                # node.text.color = "red"
                 self.make_svg()
 
     def update_previous_node(self, previous):
         for node in self.nodes:
             if node.data == previous or node in self.previous.neighbors:
                 node.circle.color = "lightgray"
-                node.text.color = "lightgray"
+                # node.text.color = "lightgray"
                 self.make_svg()
             
     def update_current_node(self, current):
@@ -221,44 +222,65 @@ class Graph:
             
             if node.data == current.data:
                 node.circle.color = "green"
-                node.text.color = "green"
+                # node.text.color = "green"
                 self.make_svg()
+    def update_previous_neighbor(self, neighbor):
+        for node in self.nodes:
+            if node.data == neighbor:
+                node.circle.color = "lightgray"
+                # node.text.color = "lightgray"
+                self.make_svg()
+
             
 
-    def dijkstras_one_call(self):
-        if self.dijkstras_queue:
-            current_V_node = heapq.heappop(self.dijkstras_queue)
-            current_V = current_V_node.data
-            if self.previous:
-                self.update_previous_node(self.previous.data)
-            self.update_current_node(current_V_node)
-            for neighbor in self.adjacency_list[current_V]:
-                temp_distance = self.dijkstras_distances[current_V] + self.edges[current_V][neighbor]
-                self.update_neighbor_node(neighbor)
-                if temp_distance < self.dijkstras_distances[neighbor]:
-                    self.dijkstras_distances[neighbor] = temp_distance
-                    self.update_text_on_edge(current_V, neighbor, temp_distance)
-                    print("Updating distance from node: ", current_V, "to ",  neighbor, " to ", temp_distance)
-            self.previous = current_V_node
+
+    async def start_dijkstras2(self, start, end):
+            self.dijkstras_predecessors = {}
+            distances = [0] * (max(self.adjacency_list.keys()) + 1)
+            queue = []
+            for node in self.nodes:
+                if node.data != start:
+                    distances[node.data] = math.inf
+                queue.append(node.data)
+            heapq.heapify(queue)
+
+            while queue:
+                current_V = heapq.heappop(queue)
+                for neighbor in self.adjacency_list[current_V]:
+                    
+                    temp_distance = distances[current_V] + self.edges[current_V][neighbor]
+                    if temp_distance < distances[neighbor]:
+                        self.dijkstras_predecessors[neighbor] = current_V
+                        distances[neighbor] = temp_distance
+            
+            shortest_path = self.construct_shortest_path(start, end)
+            await self.animate_shortest_path(shortest_path)
+
+    def construct_shortest_path(self, start, end):
+        shortest_path = []
+        current_node = end
+        while current_node != start:
+            shortest_path.append(current_node)
+            current_node = self.dijkstras_predecessors[current_node]
+        shortest_path.append(start)
+        shortest_path.reverse()
+        return shortest_path
+    
+    async def animate_shortest_path(self, path):
+        for index, node in enumerate(path):
+            start_node = self.find_node(node, id(node))
+            next_node = self.find_node(path[index+1], id(path[index+1])) if index < len(path) - 1 else None
+            if next_node:
+                start_node.circle.color = "green"
+                next_node.circle.color = "green"
+                self.make_svg()
+                await asyncio.sleep(2)
+            else:
+                start_node.circle.color = "green"
+                self.make_svg()
+                await asyncio.sleep(2)
 
 
-            if self.dijkstras_queue == []:
-                self.timer.cancel()
-                self.update_previous_node(self.previous.data)
-                print("Dijkstras done")
-                print(self.dijkstras_distances)
-
-
-
-    def start_dijkstras(self, start, end):
-        self.dijkstras_distances = [0] * (max(self.adjacency_list.keys()) + 1)
-        self.dijkstras_queue = []
-        for node in self.nodes:
-            if node.data != start:
-                self.dijkstras_distances[node.data] = math.inf
-            self.dijkstras_queue.append(node)
-
-        self.timer = ui.timer(3, self.dijkstras_one_call)
 
     
 

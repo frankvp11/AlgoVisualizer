@@ -36,8 +36,8 @@ def depth_of_binary_tree():
     algorithms.depth_of_binary_tree.add()
 
 @ui.page('/algorithms/dijkstras')
-def dijkstras():
-    algorithms.dijkstras.add()
+async def dijkstras():
+    await algorithms.dijkstras.add()
 
 @ui.page('/algorithms/binary_search')
 def binary_search():
