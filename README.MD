@@ -10,6 +10,8 @@ Todo:
       2. Add description of how it works
       3. Fix the bug where a left and right node overlap
    2. Dijkstras
+      1. Completed part of the animation
+      2. "Change" the animation so that it goes slower, and more steps, considering each node individually
    3. Binary Search 
       1. Completed the animation
       2. Add description of how it works, examples, etc
@@ -17,8 +19,13 @@ Todo:
    5. Hashing
    6. Disjoint Set unions
    7. Depth first search
+      1. Completed main animation
+      2. Add explanation
    8. Breadth first search
+      1. Completed main animation
+      2. Add explanation
    9.  Fast exponentation
+       1.  Show the tree diagram, and some small animation of the numbers in circles moving together, being multiplied and moving up
    10. Artificial Neural Network
        1.  Make it so that the "neural network" shows up, and show the animation of the training
            1.  Backprop
