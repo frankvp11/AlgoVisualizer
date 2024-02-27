@@ -79,7 +79,9 @@ class Graph:
         return node
 
     def add_edge(self, start, end, start_id, end_id, weight=0):
-        self.edges[start][end] = ( weight)
+        if self.edges[end][start] == 0 and self.edges[start][end] == 0:
+            self.edges[start][end] = ( weight)
+        
         start_node = self.find_node(start, start_id)
         end_node = self.find_node(end, end_id)
         dx = end_node.x - start_node.x
@@ -91,6 +93,7 @@ class Graph:
         end_intersection_y = end_node.y - (dy / distance) * 15        
         line = Line(start_intersection_x, start_intersection_y, end_intersection_x, end_intersection_y, color='black')
         if weight != 0 and self.edges[end][start] == 0:
+            self.edges[end][start] = weight
             text = Text(str(weight), (start_intersection_x + end_intersection_x-5) / 2, (start_intersection_y + end_intersection_y-5) / 2, fontsize=20)
             self.edge_polygons_weights.append((start, end, text))
             self.edge_polygons.append(text)
@@ -231,41 +234,79 @@ class Graph:
                 # node.text.color = "lightgray"
                 self.make_svg()
 
-            
-
+        """
+    
+1  function Dijkstra(Graph, source):
+2      dist[source] ← 0                           // Initialization
+3
+4      create vertex priority queue Q
+5
+6      for each vertex v in Graph.Vertices:
+7          if v ≠ source
+8              dist[v] ← INFINITY                 // Unknown distance from source to v
+9              prev[v] ← UNDEFINED                // Predecessor of v
+10
+11         Q.add_with_priority(v, dist[v])
+12
+13
+14     while Q is not empty:                      // The main loop
+15         u ← Q.extract_min()                    // Remove and return best vertex
+16         for each neighbor v of u:              // Go through all v neighbors of u
+17             alt ← dist[u] + Graph.Edges(u, v)
+18             if alt < dist[v]:
+19                 dist[v] ← alt
+20                 prev[v] ← u
+21                 Q.decrease_priority(v, alt)
+22
+23     return dist, prev
+"""
 
     async def start_dijkstras2(self, start, end):
-            self.dijkstras_predecessors = {}
-            distances = [0] * (max(self.adjacency_list.keys()) + 1)
-            queue = []
-            for node in self.nodes:
-                if node.data != start:
-                    distances[node.data] = math.inf
-                queue.append(node.data)
-            heapq.heapify(queue)
+        start_node = None
+        distances = {}
+        for node in self.nodes:
+            if node.data == start:
+                start_node = node
+            distances[node.data] = math.inf
+        distances[start] = 0
+        predecessors = {}
 
-            while queue:
-                current_V = heapq.heappop(queue)
-                for neighbor in self.adjacency_list[current_V]:
-                    
-                    temp_distance = distances[current_V] + self.edges[current_V][neighbor]
-                    if temp_distance < distances[neighbor]:
-                        self.dijkstras_predecessors[neighbor] = current_V
-                        distances[neighbor] = temp_distance
-            
-            shortest_path = self.construct_shortest_path(start, end)
-            await self.animate_shortest_path(shortest_path)
+        queue = [(0, start_node)]  # Priority queue ordered by distance
 
-    def construct_shortest_path(self, start, end):
+        while queue:
+            current_distance, current_node = heapq.heappop(queue)
+
+            if current_distance > distances[current_node.data]:
+                continue  # Skip if already processed
+
+            for neighbor in current_node.neighbors:
+                distance = current_distance + self.edges[current_node.data][neighbor.data]
+                if distance < distances[neighbor.data]:
+                    distances[neighbor.data] = distance
+                    predecessors[neighbor.data] = current_node.data
+                    heapq.heappush(queue, (distance, neighbor))
+
+
+
+        # print(distances)
+        distances_2 = [ 0]  * (max(distances.keys())+1)
+        for k in distances:
+            distances_2[k] = distances[k]
+        print(distances_2)
+        print(predecessors)
+        shortest_path = self.construct_shortest_path(start, end, predecessors)
+        await self.animate_shortest_path(shortest_path)
+
+    def construct_shortest_path(self, start, end, predecessors):
         shortest_path = []
         current_node = end
         while current_node != start:
             shortest_path.append(current_node)
-            current_node = self.dijkstras_predecessors[current_node]
+            current_node = predecessors[current_node]
         shortest_path.append(start)
         shortest_path.reverse()
         return shortest_path
-    
+   
     async def animate_shortest_path(self, path):
         for index, node in enumerate(path):
             start_node = self.find_node(node, id(node))
@@ -279,8 +320,16 @@ class Graph:
                 start_node.circle.color = "green"
                 self.make_svg()
                 await asyncio.sleep(2)
-
-
+        await asyncio.sleep(3)
+        for index, node in enumerate(path):
+            start_node = self.find_node(node, id(node))
+            next_node = self.find_node(path[index+1], id(path[index+1])) if index < len(path) - 1 else None
+            if next_node:
+                start_node.circle.color = "darkgray"
+                next_node.circle.color = "darkgray"
+            else:
+                start_node.circle.color = "darkgray"
+        self.make_svg()
 
     
 
