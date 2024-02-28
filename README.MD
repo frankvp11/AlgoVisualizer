@@ -26,7 +26,8 @@ Todo:
       2. Add explanation
    9.  Fast exponentation
        1.  Show the tree diagram, and some small animation of the numbers in circles moving together, being multiplied and moving up
-   10. Artificial Neural Network
-       1.  Make it so that the "neural network" shows up, and show the animation of the training
-           1.  Backprop
-           2.  Forward pass
+   10. ANN
+       1.  https://brilliant.org/wiki/artificial-neural-network/#model-desiderata   
+   11. Heaps
+       1.  https://brilliant.org/wiki/heaps/#:~:text=Heaps%20are%20tree-based%20data,implementing%20priority%20queues%2C%20and%20more
+
