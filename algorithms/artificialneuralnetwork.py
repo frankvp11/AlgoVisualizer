@@ -12,6 +12,7 @@ from ModelMaker.graphicsSVG2.CustomPolygon import CustomPolygon
 from ModelMaker.graphicsSVG2.Text import Text
 from ModelMaker.graphicsSVG2.Arrow import Arrow
 
+from functools import partial
 
 import matplotlib.pyplot as plt
 rng = np.random.RandomState(1311)
@@ -303,7 +304,7 @@ class ANN():
 
 
 def create_model_svg():
-    ui.markdown("""```python\n
+    markdown_text = """```python\n
 import torch\n
 import torch.nn as nn\n
 import torch.nn.functional as F\n
@@ -333,7 +334,47 @@ for epoch in range(1000):\n
     loss.backward()\n    
     optimizer.step()\n   
     print(loss)\n   
-```""").style("width: 10vw; height: 10vw; font-size: 8px;")
+```"""
+    markdown_text_2 = """
+import torch\n
+import torch.nn as nn\n
+import torch.nn.functional as F\n
+import numpy as np\n
+
+class SimpleModel(nn.Module):\n 
+    def __init__(self, input_size, hidden_size1, hidden_size2, output_size):\n
+        super(SimpleModel, self).__init__()\n
+        self.fc1 = nn.Linear(input_size, hidden_size1)\n      
+        self.fc2 = nn.Linear(hidden_size1, hidden_size2)\n      
+        self.fc3 = nn.Linear(hidden_size2, output_size)\n   
+                    
+def forward(self, x):\n       
+    x = F.relu(self.fc1(x))\n    
+    x = F.relu(self.fc2(x))\n      
+    x = self.fc3(x)\n      
+    return x\n
+
+model = SimpleModel(2, 4, 4, 3)\n
+loss_function = nn.CrossEntropyLoss()\n
+optimizer = torch.optim.Adam(model.parameters(), lr=0.01)\n
+loss = 0\n
+for epoch in range(1000):\n   
+    optimizer.zero_grad()\n    
+    output = model(X)\n   
+    loss = loss_function(output, y)\n  
+    loss.backward()\n    
+    optimizer.step()\n   
+    print(loss)\n   
+
+"""
+    async def copy_code(): 
+        ui.run_javascript('navigator.clipboard.writeText(`' + markdown_text_2 + '`)') 
+        ui.notify('Copied to clipboard', type='positive', color='primary') 
+    ui.icon('content_copy', size='xs').on('click', copy_code, []).style("position: relative; top: 7.5vw; left: 55vw;")  # .classes('absolute right-2 top-20 opacity-10 hover:opacity-80 cursor-pointer')
+
+    ui.markdown(markdown_text).style("width: 80%; height: fit-content; font-size: 8px; background-color: white; padding: 10px; border-radius: 10px; border: 1px solid black;")
+    
+
     
 
 
@@ -447,25 +488,28 @@ def add():
                             ui.label("Loss function:").style("font-size: 0.75vw; font-weight: bold; margin-bottom: 20px; justify-content:center;")
                         with ui.column():
                             loss_function = ui.label("Cross Entropy").style("font-size: 0.75vw; font-weight: bold; margin-bottom: 20px; justify-content:center;")
-            with ui.row().style("width: 100vw;"):
-                with ui.column():
-                    ui.label("Artificial Neural Networks (ANNs) are computational models inspired by the structure and function of biological neural networks in the human brain. They are a subset of machine learning algorithms used for tasks such as classification, regression, clustering, and pattern recognition.").style("font-size: 0.75vw; font-weight: bold; margin-bottom: 20px; justify-content:center;")
-                with ui.column():
-                    ui.label("How ANNs Work:").style("font-size: 0.75vw; font-weight: bold; margin-bottom: 20px; justify-content:center;")
-                    ui.label("ANNs consist of interconnected nodes arranged in layers. The three main types of layers are:").style("font-size: 0.75vw; font-weight: bold; margin-bottom: 20px; justify-content:center;")
-                    ui.label("Input Layer: Receives input data.").style("font-size: 0.75vw; font-weight: bold; margin-bottom: 20px; justify-content:center;")
-                    ui.label("Hidden Layers: Perform computations on the input data.").style("font-size: 0.75vw; font-weight: bold; margin-bottom: 20px; justify-content:center;")
-                    ui.label("Output Layer: Produces the final output.").style("font-size: 0.75vw; font-weight: bold; margin-bottom: 20px; justify-content:center;")
-                    ui.label("Each node in a layer is associated with a weight, which represents the strength of the connection between nodes. During training, the network adjusts these weights based on the input data and the desired output. This process is called backpropagation, where the error between the predicted output and the actual output is minimized using optimization algorithms such as gradient descent.").style("font-size: 0.75vw; font-weight: bold; margin-bottom: 20px; justify-content:center;")
-            with ui.row().style("width: 100vw;"):
-                with ui.column():
-                    ui.label("So what does this model look like?").style("font-size: 0.75vw; font-weight: bold; margin-bottom: 20px; justify-content:center;")
-                    ui.label("The model is a simple 2 layer neural network with 2 hidden layers. The input layer has 2 neurons, the first hidden layer has 4 neurons, the second hidden layer has 4 neurons, and the output layer has 3 neurons. The model is trained using the Adam optimizer and the Cross Entropy loss function.").style("font-size: 0.75vw; font-weight: bold; margin-bottom: 20px; justify-content:center;")
-                with ui.column():
-                    ui.label("The model is trained on a dataset of 2000 points, with 3 clusters. The model is trained using the Adam optimizer and the Cross Entropy loss function.").style("font-size: 0.75vw; font-weight: bold; margin-bottom: 20px; justify-content:center;")
-            with ui.row().style("width: 100vw;"):
-                with ui.column():
-                    ui.label("The following is the code used for this model:").style("font-size: 0.75vw; font-weight: bold; margin-bottom: 20px; justify-content:center;")
-                    create_model_svg()
+
+            with ui.row().style("width: 100vw; justify-content:center; align-items:center; height: fit-content;"):
+                with ui.row().style("width: 80vw; justify-content:center; align-items:center; border: 1px solid black; background-color: lightgrey; border-radius: 10px; padding: 10px; overflow-y: visible; min-height: fit-content;"):
+                    
+                    with ui.column().style("display: flex; justify-content: center; align-items: center; width: 100vw; "):
+                        ui.label("How ANNs Work:").style("font-size: 1.5vw; font-weight: bold; text-align:center; ")
+
+                    with ui.column().style("width: 100vw; "):
+                        ui.label("Artificial Neural Networks (ANNs) are computational models inspired by the structure and function of biological neural networks in the human brain. They are a subset of machine learning algorithms used for tasks such as classification, regression, clustering, and pattern recognition.").style("font-size: 0.75vw; font-weight: bold; justify-content:center;")
+                        ui.label("ANNs consist of interconnected nodes arranged in layers. The three main types of layers are:").style("font-size: 0.75vw; font-weight: bold;  justify-content:left;")
+                        ui.label("Input Layer: Receives input data.").style("font-size: 0.75vw; font-weight: bold; justify-content:left;")
+                        ui.label("Hidden Layers: Perform computations on the input data.").style("font-size: 0.75vw; font-weight: bold; justify-content:left;")
+                        ui.label("Output Layer: Produces the final output.").style("font-size: 0.75vw; font-weight: bold; justify-content:center;")
+                        ui.label("Each node in a layer is associated with a weight, which represents the strength of the connection between nodes. During training, the network adjusts these weights based on the input data and the desired output. This process is called backpropagation, where the error between the predicted output and the actual output is minimized using optimization algorithms such as gradient descent.").style("font-size: 0.75vw; font-weight: bold;  justify-content:center;")
+                    with ui.column().style("width: 100vw; "):
+                        ui.label("So what does this model look like?").style("font-size: 0.75vw; font-weight: bold; justify-content:center;")
+                        ui.label("The model is a simple 2 layer neural network with 2 hidden layers. The input layer has 2 neurons, the first hidden layer has 4 neurons, the second hidden layer has 4 neurons, and the output layer has 3 neurons. The model is trained using the Adam optimizer and the Cross Entropy loss function.").style("font-size: 0.75vw; font-weight: bold; justify-content:center;")
+                    with ui.column().style("width: 100vw; "):
+                        ui.label("The model is trained on a dataset of 2000 points, with 3 clusters. The model is trained using the Adam optimizer and the Cross Entropy loss function.").style("font-size: 0.75vw; font-weight: bold; justify-content:center;")
+                    with ui.column().style("width: 100vw; "):
+                        ui.label("The following is the code used for this model:").style("font-size: 0.75vw; font-weight: bold;  justify-content:center;")
+                    with ui.column().style("width: 100vw; "):
+                        create_model_svg()
         
     stuff()
