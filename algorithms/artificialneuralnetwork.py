@@ -370,7 +370,7 @@ for epoch in range(1000):\n
     async def copy_code(): 
         ui.run_javascript('navigator.clipboard.writeText(`' + markdown_text_2 + '`)') 
         ui.notify('Copied to clipboard', type='positive', color='primary') 
-    ui.icon('content_copy', size='xs').on('click', copy_code, []).style("position: relative; top: 7.5vw; left: 55vw;")  # .classes('absolute right-2 top-20 opacity-10 hover:opacity-80 cursor-pointer')
+    ui.icon('content_copy', size='xs').on('click', copy_code, []).style("position: relative; top: 6.5vw; left: 57.5vw;")  # .classes('absolute right-2 top-20 opacity-10 hover:opacity-80 cursor-pointer')
 
     ui.markdown(markdown_text).style("width: 80%; height: fit-content; font-size: 8px; background-color: white; padding: 10px; border-radius: 10px; border: 1px solid black;")
     
@@ -399,9 +399,8 @@ def add():
                 image.bind_content_from(svgcontent, 'content')
             with ui.column().style("width: 20vw; "):
                 with ui.row():
-                    with ui.column():
-                        ui.button("Generate new graph", on_click=lambda: (stuff.refresh()).style("font-size: 0.75vw"))
-                    with ui.column():
+                    with ui.column().style():
+                        ui.button("Generate new graph", on_click=lambda: (stuff.refresh())).style("font-size: 0.75vw; width: 8.5vw; height: 6.5vh; ")
                         ui.button("Start training", on_click=lambda: svgcontent.start_timer()).style("font-size: 0.75vw")
                         ui.button("Pause training", on_click=lambda: svgcontent.end_timer()).style("font-size: 0.75vw")
                         with ui.row():
@@ -461,54 +460,54 @@ def add():
                 with ui.column():
                     with ui.row():
                         with ui.column():
-                            ui.label("Loss:").style("font-size: 0.75vw; font-weight: bold; margin-bottom: 20px; justify-content:center;")
+                            ui.label("Loss:").style("font-size: 0.75vw;  margin-bottom: 20px; justify-content:center;")
                         with ui.column():
-                            loss = ui.label("").style("font-size: 0.75vw; font-weight: bold; margin-bottom: 20px; justify-content:center;")
+                            loss = ui.label("").style("font-size: 0.75vw;  margin-bottom: 20px; justify-content:center;")
                             loss.bind_text_from(svgcontent, 'loss')
                     with ui.row():
                         with ui.column():
-                            ui.label("Epoch:").style("font-size: 0.75vw; font-weight: bold; margin-bottom: 20px; justify-content:center;")
+                            ui.label("Epoch:").style("font-size: 0.75vw;  margin-bottom: 20px; justify-content:center;")
                         with ui.column():
-                            epoch = ui.label("").style("font-size: 0.75vw; font-weight: bold; margin-bottom: 20px; justify-content:center;")
+                            epoch = ui.label("").style("font-size: 0.75vw;  margin-bottom: 20px; justify-content:center;")
                             epoch.bind_text_from(svgcontent, 'current_epoch')
                     with ui.row():
                         with ui.column():
-                            ui.label("Parameters:").style("font-size: 0.75vw; font-weight: bold; margin-bottom: 20px; justify-content:center;")
+                            ui.label("Parameters:").style("font-size: 0.75vw;  margin-bottom: 20px; justify-content:center;")
                         with ui.column():
                             svgcontent.get_n_params()
-                            parameters = ui.label("").style("font-size: 0.75vw; font-weight: bold; margin-bottom: 20px; justify-content:center;")
+                            parameters = ui.label("").style("font-size: 0.75vw;  margin-bottom: 20px; justify-content:center;")
                             parameters.bind_text_from(svgcontent, 'parameters')
                     with ui.row():
                         with ui.column():
-                            ui.label("Optimizer:").style("font-size: 0.75vw; font-weight: bold; margin-bottom: 20px; justify-content:center;")
+                            ui.label("Optimizer:").style("font-size: 0.75vw;  margin-bottom: 20px; justify-content:center;")
                         with ui.column():
-                            optimizer = ui.label("Adam").style("font-size: 0.75vw; font-weight: bold; margin-bottom: 20px; justify-content:center;")
+                            optimizer = ui.label("Adam").style("font-size: 0.75vw;  margin-bottom: 20px; justify-content:center;")
                     with ui.row():
                         with ui.column():
-                            ui.label("Loss function:").style("font-size: 0.75vw; font-weight: bold; margin-bottom: 20px; justify-content:center;")
+                            ui.label("Loss function:").style("font-size: 0.75vw;  margin-bottom: 20px; justify-content:center;")
                         with ui.column():
-                            loss_function = ui.label("Cross Entropy").style("font-size: 0.75vw; font-weight: bold; margin-bottom: 20px; justify-content:center;")
+                            loss_function = ui.label("Cross Entropy").style("font-size: 0.75vw;  margin-bottom: 20px; justify-content:center;")
 
             with ui.row().style("width: 100vw; justify-content:center; align-items:center; height: fit-content;"):
                 with ui.row().style("width: 80vw; justify-content:center; align-items:center; border: 1px solid black; background-color: lightgrey; border-radius: 10px; padding: 10px; overflow-y: visible; min-height: fit-content;"):
                     
                     with ui.column().style("display: flex; justify-content: center; align-items: center; width: 100vw; "):
-                        ui.label("How ANNs Work:").style("font-size: 1.5vw; font-weight: bold; text-align:center; ")
+                        ui.label("How ANNs Work:").style("font-size: 1.5vw;  text-align:center; ")
 
                     with ui.column().style("width: 100vw; "):
-                        ui.label("Artificial Neural Networks (ANNs) are computational models inspired by the structure and function of biological neural networks in the human brain. They are a subset of machine learning algorithms used for tasks such as classification, regression, clustering, and pattern recognition.").style("font-size: 0.75vw; font-weight: bold; justify-content:center;")
-                        ui.label("ANNs consist of interconnected nodes arranged in layers. The three main types of layers are:").style("font-size: 0.75vw; font-weight: bold;  justify-content:left;")
-                        ui.label("Input Layer: Receives input data.").style("font-size: 0.75vw; font-weight: bold; justify-content:left;")
-                        ui.label("Hidden Layers: Perform computations on the input data.").style("font-size: 0.75vw; font-weight: bold; justify-content:left;")
-                        ui.label("Output Layer: Produces the final output.").style("font-size: 0.75vw; font-weight: bold; justify-content:center;")
-                        ui.label("Each node in a layer is associated with a weight, which represents the strength of the connection between nodes. During training, the network adjusts these weights based on the input data and the desired output. This process is called backpropagation, where the error between the predicted output and the actual output is minimized using optimization algorithms such as gradient descent.").style("font-size: 0.75vw; font-weight: bold;  justify-content:center;")
+                        ui.label("Artificial Neural Networks (ANNs) are computational models inspired by the structure and function of biological neural networks in the human brain. They are a subset of machine learning algorithms used for tasks such as classification, regression, clustering, and pattern recognition.").style("font-size: 0.75vw;  justify-content:center;")
+                        ui.label("ANNs consist of interconnected nodes arranged in layers. The three main types of layers are:").style("font-size: 0.75vw;   justify-content:left;")
+                        ui.label("Input Layer: Receives input data.").style("font-size: 0.75vw;  justify-content:left;")
+                        ui.label("Hidden Layers: Perform computations on the input data.").style("font-size: 0.75vw;  justify-content:left;")
+                        ui.label("Output Layer: Produces the final output.").style("font-size: 0.75vw;  justify-content:center;")
+                        ui.label("Each node in a layer is associated with a weight, which represents the strength of the connection between nodes. During training, the network adjusts these weights based on the input data and the desired output. This process is called backpropagation, where the error between the predicted output and the actual output is minimized using optimization algorithms such as gradient descent.").style("font-size: 0.75vw;   justify-content:center;")
                     with ui.column().style("width: 100vw; "):
-                        ui.label("So what does this model look like?").style("font-size: 0.75vw; font-weight: bold; justify-content:center;")
-                        ui.label("The model is a simple 2 layer neural network with 2 hidden layers. The input layer has 2 neurons, the first hidden layer has 4 neurons, the second hidden layer has 4 neurons, and the output layer has 3 neurons. The model is trained using the Adam optimizer and the Cross Entropy loss function.").style("font-size: 0.75vw; font-weight: bold; justify-content:center;")
+                        ui.label("So what does this model look like?").style("font-size: 0.75vw;  justify-content:center;")
+                        ui.label("The model is a simple 2 layer neural network with 2 hidden layers. The input layer has 2 neurons, the first hidden layer has 4 neurons, the second hidden layer has 4 neurons, and the output layer has 3 neurons. The model is trained using the Adam optimizer and the Cross Entropy loss function.").style("font-size: 0.75vw;  justify-content:center;")
                     with ui.column().style("width: 100vw; "):
-                        ui.label("The model is trained on a dataset of 2000 points, with 3 clusters. The model is trained using the Adam optimizer and the Cross Entropy loss function.").style("font-size: 0.75vw; font-weight: bold; justify-content:center;")
+                        ui.label("The model is trained on a dataset of 2000 points, with 3 clusters. The model is trained using the Adam optimizer and the Cross Entropy loss function.").style("font-size: 0.75vw;  justify-content:center;")
                     with ui.column().style("width: 100vw; "):
-                        ui.label("The following is the code used for this model:").style("font-size: 0.75vw; font-weight: bold;  justify-content:center;")
+                        ui.label("The following is the code used for this model:").style("font-size: 0.75vw;   justify-content:center;")
                     with ui.column().style("width: 100vw; "):
                         create_model_svg()
         
