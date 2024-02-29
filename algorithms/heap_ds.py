@@ -18,6 +18,7 @@ class Heap:
         self.arr = arr
         self.size = len(arr)
         self.polygons = ShapeCollection()
+        self.polygons.clear_all_polygons()
         self.content = ""
         self.current_x=  500
         self.current_y = 100
@@ -53,15 +54,17 @@ class Heap:
         max_val = self.arr[0]
         self.arr[0] = self.arr[self.size - 1]
         self.size -= 1
+        self.arr.pop()
         self.heapify(0)
         return max_val
 
     def delete(self, i):
-        self.arr[i] = float("inf")
+        self.arr[i] = float("-inf")  # Change to negative infinity
         while i > 0 and self.arr[i] > self.arr[(i - 1) // 2]:
             self.arr[i], self.arr[(i - 1) // 2] = self.arr[(i - 1) // 2], self.arr[i]
             i = (i - 1) // 2
         self.extract_max()
+
 
     def get_max(self):
         if self.size < 1:
@@ -74,31 +77,58 @@ class Heap:
             self.size -= 1
             self.heapify(0)
         return self.arr
-    
+
+
     def heap_to_binary_tree(self):
         if not self.arr:
             return None
 
         root = Tree(self.arr[0])
-        queue = [root]
+        self.polygons.clear_all_polygons()
+        queue = [(root, 750, 200)]
+        circle = Circle(750, 200, 45, color='darkgray', transparency=0.9)
+        circle.give_outline(color='black', thickness=2)
+        text = Text(self.arr[0], 747, 200, font_size=40)
+        self.polygons.add_polygon(circle)
+        self.polygons.add_polygon(text)
         i = 1
 
         while i < len(self.arr):
-            current = queue.pop(0)
+            current, x, y = queue.pop(0)
 
             left_val = self.arr[i]
             if left_val is not None:
+                circle = Circle(x - 250, y + 250, 45, color='darkgray', transparency=0.9)
+                circle.give_outline(color='black', thickness=2)
+                text = Text(left_val, x - 255, y + 250, font_size=40)
+                self.polygons.add_polygon(circle)
+                self.polygons.add_polygon(text)
+
                 current.left = Tree(left_val)
-                queue.append(current.left)
+                arrow = Arrow(x, y, x - 250, y + 250)
+                self.polygons.polygons.extend(arrow.polygons)
+
+                queue.append((current.left, x - 250, y + 250))
 
             i += 1
 
             if i < len(self.arr):
                 right_val = self.arr[i]
                 if right_val is not None:
+                    circle = Circle(x + 250, y + 250, 45, color='darkgray', transparency=0.9)
+                    circle.give_outline(color='black', thickness=2)
+                    text = Text(right_val, x + 245, y + 250, font_size=40)
+                    self.polygons.add_polygon(circle)
+                    self.polygons.add_polygon(text)
+
                     current.right = Tree(right_val)
-                    queue.append(current.right)
+                    arrow = Arrow(x, y, x + 250, y + 250)
+                    self.polygons.polygons.extend(arrow.polygons)
+
+                    queue.append((current.right, x + 250, y + 250))
 
                 i += 1
+
+        self.content = self.polygons.to_svg()
 
         return root

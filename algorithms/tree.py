@@ -6,36 +6,28 @@ from ModelMaker.graphicsSVG2.Circle import Circle
 from ModelMaker.graphicsSVG2.Line import Line
 from ModelMaker.graphicsSVG2.Text import Text
 from ModelMaker.graphicsSVG2.Arrow  import Arrow
+
+
 class Tree:
     def __init__(self, value):
         self.value = value
         self.left = None
         self.right = None
-        self.shapes = ShapeCollection()
 
     def traverse_recursive(self, x, y):
-        print(self.value)
+        
         if self.value:
-            circle = Circle(x, y, 15, color='darkgray', transparency=0.9)
-            circle.give_outline(color='black', thickness=2)
-            text = Text(self.value, x-3, y, fontsize=10)
-            self.shapes.add_polygon(circle)
-            self.shapes.add_polygon(text)
-        if self.left:
-            new_x = 0.9 * ( (x-100) - x) + x
-            new_y = 0.9 * ( (y+100) - y) + y
-            start_x  = 0.9 * (x - (x-100)) + (x-100)
-            start_y  = 0.9 * (y - (y+100)) + (y+100)
-            arrow = Arrow(start_x, start_y, new_x, new_y)
-            self.shapes.polygons.extend(arrow.polygons)
+            print("Value: ", self.value)
+            # circle = Circle(x, y, 45, color='darkgray', transparency=0.9)
+            # circle.give_outline(color='black', thickness=2)
+            # text = Text(self.value, x-3, y, font_size=40)
 
-            self.left.traverse_recursive(x-100, y+100)
-        if self.right:
-            new_x = 0.9 * ( (x+100) - x) + x
-            new_y = 0.9 * ( (y+100) - y) + y
-            start_x  = 0.9 * (x - (x+100)) + (x+100)
-            start_y  = 0.9 * (y - (y+100)) + (y+100)
-            arrow = Arrow(start_x, start_y, new_x, new_y)
-            self.shapes.polygons.extend(arrow.polygons)
-            self.right.traverse_recursive(x+100, y+100)
+        if self.left and self.left.value:
+            
+            # arrow = Arrow(x, y, x - 250, y + 250)
+            self.left.traverse_recursive(x - 250, y + 250)
+            
 
+        if self.right and self.right.value:
+            # arrow = Arrow(x, y, x + 250, y + 250)
+            self.right.traverse_recursive(x + 250, y + 250)
