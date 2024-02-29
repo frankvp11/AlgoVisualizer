@@ -582,44 +582,19 @@ def add():
                             "font-size: 1vw; justify-content:center; margin-top:-10px; font-family: 'Lucida Console', 'Courier New', monospace;")
                         LatexElement(
                             "X = \{(x_1, y_1), .... , (x_N, y_N)\}").update()
-                        ui.label("such that E(x,y) is minized when teh output y approximates the target output y for all inputs x. Commonly used error functions include the mean squared error (MSE) for regression problems and cross-entropy for classification problems.").style(
+                        ui.label("such that E(x,y) is minized when the output y approximates the target output y for all inputs x. Commonly used error functions include the mean squared error (MSE) for regression problems and cross-entropy for classification problems.").style(
                             "font-size: 1vw; justify-content:center; margin-top:-10px; font-family: 'Lucida Console', 'Courier New', monospace;")
+                        ui.label("To minimize the error function E(X,θ) with respect to the parameters θ, techniques like gradient descent are employed. Gradient descent iteratively updates the parameters by moving in the direction of the negative gradient of the error function. This process continues until a local minimum is reached or the gradient converges sufficiently.").style(
+                            "font-size: 1vw; justify-content:center; margin-top:-10px; font-family: 'Lucida Console', 'Courier New', monospace;")
+                        ui.label("Gradient descent offers the advantage of being applicable to online learning, where parameters are updated incrementally as new input-output pairs arrive. It can also mimic batch learning if the step size η is appropriately chosen. However, it should be noted that gradient descent may converge to local minima due to its local nature. Despite this, recent research suggests that this is not a significant issue for ANNs, as most local minima are evenly distributed and similar in magnitude for large networks.").style(
+                            "font-size: 1vw; justify-content:center; margin-top:-10px; font-family: 'Lucida Console', 'Courier New', monospace;")
+                        ui.label("A critical breakthrough in ANN training came with the development of backpropagation in the mid-1980s. Backpropagation enables the calculation of gradients with respect to an ANN's parameters, making training feasible even for complex networks with numerous nodes and layers. This method revolutionized ANN research, facilitating the training of sophisticated models previously deemed mathematically intractable.").style(
+                            "font-size: 1vw; justify-content:center; margin-top:-10px; font-family: 'Lucida Console', 'Courier New', monospace;")
+                        
                     with ui.column().style("width: 100vw; "):
-                        ui.label("The following is the code used for this model:").style(
-                            "font-size: 0.75vw;   justify-content:center;")
+
+                        ui.label("Below you can see the code that I used to make and train this model:").style(
+                            "font-size: 1vw; justify-content:center; margin-top:-10px; font-family: 'Lucida Console', 'Courier New', monospace;")
                     with ui.column().style("width: 100vw; "):
                         create_model_svg()
     stuff()
-
-
-"""
-
-E over a set of input-output pairs 
-
- )} such that 
-
-E(x,y) is minimized when the output 
-
-y approximates the target output 
-
-y for all inputs 
-
-x. Commonly used error functions include the mean squared error (MSE) for regression problems and cross-entropy for classification problems.
-
-To minimize the error function 
-
-E(X,θ) with respect to the parameters 
-
-θ, techniques like gradient descent are employed. Gradient descent iteratively updates the parameters by moving in the direction of the negative gradient of the error function. This process continues until a local minimum is reached or the gradient converges sufficiently.
-
-Gradient descent offers the advantage of being applicable to online learning, where parameters are updated incrementally as new input-output pairs arrive. It can also mimic batch learning if the step size 
-
-η is appropriately chosen. However, it should be noted that gradient descent may converge to local minima due to its local nature. Despite this, recent research suggests that this is not a significant issue for ANNs, as most local minima are evenly distributed and similar in magnitude for large networks.
-
-A critical breakthrough in ANN training came with the development of backpropagation in the mid-1980s. Backpropagation enables the calculation of gradients with respect to an ANN's parameters, making training feasible even for complex networks with numerous nodes and layers. This method revolutionized ANN research, facilitating the training of sophisticated models previously deemed mathematically intractable.
-
-
-
-
-
-"""
