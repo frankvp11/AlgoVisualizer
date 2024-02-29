@@ -330,67 +330,67 @@ class ANN():
 
 
 def create_model_svg():
-    markdown_text = """```python\n
-import torch\n
-import torch.nn as nn\n
-import torch.nn.functional as F\n
-import numpy as np\n
+    markdown_text = """```python
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import numpy as np
 
-class SimpleModel(nn.Module):\n 
-    def __init__(self, input_size, hidden_size1, hidden_size2, output_size):\n
-        super(SimpleModel, self).__init__()\n
-        self.fc1 = nn.Linear(input_size, hidden_size1)\n      
-        self.fc2 = nn.Linear(hidden_size1, hidden_size2)\n      
-        self.fc3 = nn.Linear(hidden_size2, output_size)\n   
+class SimpleModel(nn.Module): 
+    def __init__(self, input_size, hidden_size1, hidden_size2, output_size):
+        super(SimpleModel, self).__init__()
+        self.fc1 = nn.Linear(input_size, hidden_size1)      
+        self.fc2 = nn.Linear(hidden_size1, hidden_size2)      
+        self.fc3 = nn.Linear(hidden_size2, output_size)   
                     
-def forward(self, x):\n       
-    x = F.relu(self.fc1(x))\n    
-    x = F.relu(self.fc2(x))\n      
-    x = self.fc3(x)\n      
-    return x\n
+def forward(self, x):       
+    x = F.relu(self.fc1(x))    
+    x = F.relu(self.fc2(x))      
+    x = self.fc3(x)      
+    return x
 
-model = SimpleModel(2, 4, 4, 3)\n
-loss_function = nn.CrossEntropyLoss()\n
-optimizer = torch.optim.Adam(model.parameters(), lr=0.01)\n
-loss = 0\n
-for epoch in range(1000):\n   
-    optimizer.zero_grad()\n    
-    output = model(X)\n   
-    loss = loss_function(output, y)\n  
-    loss.backward()\n    
-    optimizer.step()\n   
-    print(loss)\n   
+model = SimpleModel(2, 4, 4, 3)
+loss_function = nn.CrossEntropyLoss()
+optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+loss = 0
+for epoch in range(1000):   
+    optimizer.zero_grad()    
+    output = model(X)   
+    loss = loss_function(output, y)  
+    loss.backward()    
+    optimizer.step()   
+    print(loss)   
 ```"""
     markdown_text_2 = """
-import torch\n
-import torch.nn as nn\n
-import torch.nn.functional as F\n
-import numpy as np\n
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import numpy as np
 
-class SimpleModel(nn.Module):\n 
-    def __init__(self, input_size, hidden_size1, hidden_size2, output_size):\n
-        super(SimpleModel, self).__init__()\n
-        self.fc1 = nn.Linear(input_size, hidden_size1)\n      
-        self.fc2 = nn.Linear(hidden_size1, hidden_size2)\n      
-        self.fc3 = nn.Linear(hidden_size2, output_size)\n   
+class SimpleModel(nn.Module): 
+    def __init__(self, input_size, hidden_size1, hidden_size2, output_size):
+        super(SimpleModel, self).__init__()
+        self.fc1 = nn.Linear(input_size, hidden_size1)      
+        self.fc2 = nn.Linear(hidden_size1, hidden_size2)      
+        self.fc3 = nn.Linear(hidden_size2, output_size)   
                     
-def forward(self, x):\n       
-    x = F.relu(self.fc1(x))\n    
-    x = F.relu(self.fc2(x))\n      
-    x = self.fc3(x)\n      
-    return x\n
+def forward(self, x):       
+    x = F.relu(self.fc1(x))    
+    x = F.relu(self.fc2(x))      
+    x = self.fc3(x)      
+    return x
 
-model = SimpleModel(2, 4, 4, 3)\n
-loss_function = nn.CrossEntropyLoss()\n
-optimizer = torch.optim.Adam(model.parameters(), lr=0.01)\n
-loss = 0\n
-for epoch in range(1000):\n   
-    optimizer.zero_grad()\n    
-    output = model(X)\n   
-    loss = loss_function(output, y)\n  
-    loss.backward()\n    
-    optimizer.step()\n   
-    print(loss)\n   
+model = SimpleModel(2, 4, 4, 3)
+loss_function = nn.CrossEntropyLoss()
+optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+loss = 0
+for epoch in range(1000):   
+    optimizer.zero_grad()    
+    output = model(X)   
+    loss = loss_function(output, y)  
+    loss.backward()    
+    optimizer.step()   
+    print(loss)   
 
 """
 
