@@ -410,9 +410,12 @@ def add():
     with ui.header():
         with ui.link(target="/"):
             ui.button(icon="home")
+    svgcontent = None
+    
 
-    @ui.refreshable
+    
     def stuff():
+        
         with ui.row().style("width: 100vw; justify-content:center; text-align:center; align-items:center;"):
             ui.label("Artificial Neural Networks").style(
                 "font-size: 3vw; font-weight: bold; margin-bottom: 20px; justify-content:center;")
@@ -425,7 +428,10 @@ def add():
             with ui.column().style("width: 20vw; "):
                 with ui.row():
                     with ui.column().style():
-                        ui.button("Generate new graph", on_click=lambda: (stuff.refresh())).style(
+                        def generate_new_points():
+                            svgcontent.__init__()
+
+                        ui.button("Generate new graph", on_click=lambda: (generate_new_points())).style(
                             "font-size: 0.75vw; width: 8.5vw; height: 6.5vh; ")
                         ui.button("Start training", on_click=lambda: svgcontent.start_timer()).style(
                             "font-size: 0.75vw")
