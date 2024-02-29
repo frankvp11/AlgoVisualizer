@@ -110,17 +110,78 @@ def make_tree():
         tree.insert(value, 100, 50)
     polygons = make_tree_polygons(tree)    
     group = ShapeCollection.ShapeCollection(polygons)
-    group.move_all(150, 0)
+    group.move_all(120, 0)
     return group, tree
 
 
 
-
-
-
-
-
+def implementation():
+    markdown_text_2 = """
     
+    class BinaryTree:
+        def __init__(self, value) -> None:
+            self.value = value
+            self.left = None
+            self.right = None
+    
+        def insert(self, value):
+            if value < self.value:
+                if self.left is None:
+                    self.left = BinaryTree(value)
+                else:
+                    self.left.insert(value)
+            else:
+                if self.right is None:
+                    self.right = BinaryTree(value)
+                else:
+                    self.right.insert(value)
+    def determine_binary_tree_depth(root, current_depth=1):
+        if root is None:
+            return 0
+        else:
+            left = determine_binary_tree_depth(root.left, current_depth + 1)
+            right = determine_binary_tree_depth(root.right, current_depth + 1)
+            return max(left, right) + 1
+    
+        """
+
+    markdown_text = """
+    ```python
+    class BinaryTree:
+        def __init__(self, value) -> None:
+            self.value = value
+            self.left = None
+            self.right = None
+    
+        def insert(self, value):
+            if value < self.value:
+                if self.left is None:
+                    self.left = BinaryTree(value)
+                else:
+                    self.left.insert(value)
+            else:
+                if self.right is None:
+                    self.right = BinaryTree(value)
+                else:
+                    self.right.insert(value)
+    def determine_binary_tree_depth(root, current_depth=1):
+        if root is None:
+            return 0
+        else:
+            left = determine_binary_tree_depth(root.left, current_depth + 1)
+            right = determine_binary_tree_depth(root.right, current_depth + 1)
+            return max(left, right) + 1
+    ```        
+        """
+    async def copy_code():
+        ui.run_javascript(
+            'navigator.clipboard.writeText(`' + markdown_text_2 + '`)')
+        ui.notify('Copied to clipboard', type='positive', color='primary')
+    ui.icon('content_copy', size='xs').on('click', copy_code, []).style(
+        "position: relative; top: 5.5vw; left: 47.5vw;")
+
+    ui.markdown(markdown_text).style(
+        "width: 90%; height: fit-content; font-size: 8px; background-color: white; padding: 10px; border-radius: 10px; border: 1px solid black;")
 
 
 def add():
@@ -134,13 +195,13 @@ def add():
 
         with ui.row().style("width: 100vw; justify-content:center; text-align:center; align-items:center;"):
             ui.label("Depth of Binary Tree Algorithm").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
-        with ui.row().style("width: 100vw; display:flex;"):
-            with ui.column():
-                image = ui.interactive_image(source="/static/binarytreesvg.svg").style("width: 400px; height: 400px;")
+        with ui.row().style("width: 100vw; height: 25vw;"):
+            with ui.column().style("width: 35vw; height: 20vw; "):
+                image = ui.interactive_image(source="/static/binarytreesvg.svg").style("width: 40vw; height: 20vw;")
                 polygons, tree = make_tree()
                 svgcontent = SVGContent(polygons)
                 image.bind_content_from(svgcontent, 'content')
-            with ui.column().style("width: 60%; height: 10%;"):
+            with ui.column().style("width: 20vw;"):
                 with ui.row():
                     with ui.column():
                         ui.label("Current Depth:") 
@@ -172,11 +233,51 @@ def add():
                     with ui.column():
                         text = ui.label("")
                         text.bind_text_from(svgcontent, 'max_depth')
-        with ui.row():
-            ui.button("Refresh", on_click= lambda e : stuff.refresh())
+            with ui.column().style("width: 20vw; margin-left: 10vw;"):
+                with ui.row():
+                    ui.button("Refresh", on_click= lambda e : stuff.refresh())
+                with ui.row():
+                    ui.button("Start timer", on_click= lambda e : svgcontent.start_timer(tree))
+    
+    
+        with ui.row().style("width: 100vw; align-items:center; justify-content:center;"):
+            with ui.row().style("width: 60vw; background-color:lightgrey; border-radius: 10px; padding: 10px; margin-top: 10px; border: 1px solid black;"):
+                with ui.column().style("width: 100vw; height: fit-content; text-align:center; align-items:center; justify-content:center;"):
+                    ui.label("Depth of a Binary Tree").style("font-size: 1.5vw; font-weight: bold;")
+                with ui.column():
+                    ui.label("The depth of a binary tree is the number of edges from the root to the furthest leaf node.")
+                ui.column().style("width: 60vw; background-color: black; height: 1px; margin-top: 10px; margin-bottom: 10px;")
+                with ui.column():
+                    ui.label("Consider a binary search tree (BST) as a hierarchical structure where each node has at most two children: a left child and a right child. The depth of a binary search tree refers to the length of the longest path from the root node to any leaf node.").style(
+                        "font-size: 1vw; justify-content:center; margin-top:-10px; font-family: 'Lucida Console', 'Courier New', monospace;")
+                with ui.column():
+                    ui.label("To understand this concept further, let's break it down into steps:").style("font-size: 1vw; justify-content:center; margin-top:-10px; font-family: 'Lucida Console', 'Courier New', monospace;")
+                with ui.column():
+                    ui.label("1. Begin at the root node of the BST.").style("font-size: 1vw; justify-content:center; margin-top:-10px; font-family: 'Lucida Console', 'Courier New', monospace;")
+                with ui.column():
+                    ui.label("2. Traverse down the tree, moving to the left child or the right child depending on whether the value being searched for is smaller or larger than the current node's value.").style("font-size: 1vw; justify-content:center; margin-top:-10px; font-family: 'Lucida Console', 'Courier New', monospace;")
+                with ui.column():
+                    ui.label("3. Continue this process until reaching a leaf node, which has no children.").style("font-size: 1vw; justify-content:center; margin-top:-10px; font-family: 'Lucida Console', 'Courier New', monospace;")
+                with ui.column():
+                    ui.label("The depth of the tree is then determined by the length of this longest path.").style("font-size: 1vw; justify-content:center; margin-top:-10px; font-family: 'Lucida Console', 'Courier New', monospace;")
+                ui.column().style("width: 60vw; background-color: black; height: 1px; margin-top: 10px; margin-bottom: 10px;")
+                with ui.column():
+                    ui.label("Understanding the depth of a binary search tree is crucial for assessing its efficiency. A well-balanced tree, where the depth is minimized, allows for faster search operations. Conversely, an unbalanced tree with significant depth may result in slower search times.").style("font-size: 1vw; justify-content:center; margin-top:-10px; font-family: 'Lucida Console', 'Courier New', monospace;")
+                with ui.column():
+                    ui.label("Overall, the depth of a binary search tree plays a fundamental role in determining its performance characteristics, making it a key aspect to consider when analyzing or designing tree-based data structures.").style("font-size: 1vw; justify-content:center; margin-top:-10px; font-family: 'Lucida Console', 'Courier New', monospace;")
+                
+                
+                ui.column().style("width: 60vw; background-color: black; height: 1px; margin-top: 10px;")
+                with ui.column().style("text-align: left; width: 100vw; "):
+                    ui.label("Implementation").style("font-size: 1.5vw; font-weight: bold;")
+                
+                with ui.column().style("text-align: left; width: 100vw; "):
+                    implementation()
+                    
 
 
 
-        with ui.row():
-            ui.button("Start timer", on_click= lambda e : svgcontent.start_timer(tree))
     stuff()
+
+
+
