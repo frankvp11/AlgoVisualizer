@@ -31,3 +31,5 @@ Todo:
    11. Heaps
        1.  https://brilliant.org/wiki/heaps/#:~:text=Heaps%20are%20tree-based%20data,implementing%20priority%20queues%2C%20and%20more
 
+3. Bug Fixes:
+   1. Fix the tree drawing -> figure out how Matthew did it in 1XD3

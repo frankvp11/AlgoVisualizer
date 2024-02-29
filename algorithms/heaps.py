@@ -41,7 +41,13 @@ async def add():
                             
                     image.content = heap.polygons.to_svg()
 
-                ui.button("Extract max", on_click=lambda e : thing())
-            
+                def add_value_to_heap():
+                    heap.insert(int(add_value.value))
+                    image.content = ""
+                    new_root = heap.heap_to_binary_tree()
+                    image.content = heap.polygons.to_svg()
 
+                ui.button("Extract max", on_click=lambda e : thing())
+                add_value = ui.input("Enter a number")
+                add_value.on("keydown.enter", lambda e : add_value_to_heap())
     await stuff()

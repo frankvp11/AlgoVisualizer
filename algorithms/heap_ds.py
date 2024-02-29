@@ -105,7 +105,12 @@ class Heap:
                 self.polygons.add_polygon(text)
 
                 current.left = Tree(left_val)
-                arrow = Arrow(x, y, x - 250, y + 250)
+                new_x = 0.875 * ( (x-250) - x) + x
+                new_y = 0.875 * ( (y+250) - y) + y
+                start_x  = 0.875 * (x - (x-250)) + (x-250)
+                start_y  = 0.875 * (y - (y+250)) + (y+250)
+                arrow = Arrow(start_x, start_y, new_x, new_y, head_width=20)
+                
                 self.polygons.polygons.extend(arrow.polygons)
 
                 queue.append((current.left, x - 250, y + 250))
@@ -122,7 +127,11 @@ class Heap:
                     self.polygons.add_polygon(text)
 
                     current.right = Tree(right_val)
-                    arrow = Arrow(x, y, x + 250, y + 250)
+                    new_x = 0.875 * ( (x+250) - x) + x
+                    new_y = 0.875 * ( (y+250) - y) + y
+                    start_x  = 0.875 * (x - (x+250)) + (x+250)
+                    start_y  = 0.875 * (y - (y+250)) + (y+250)
+                    arrow = Arrow(start_x, start_y, new_x, new_y, head_width=20)
                     self.polygons.polygons.extend(arrow.polygons)
 
                     queue.append((current.right, x + 250, y + 250))
