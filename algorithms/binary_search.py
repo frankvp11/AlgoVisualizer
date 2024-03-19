@@ -162,21 +162,21 @@ def add():
         global timer
         with ui.row().style("width: 95vw; justify-content:center; text-align:center; align-items:center;"):
             ui.label("Binary Search Algorithm").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
-        with ui.row():
+        with ui.row().style("width: 100vw;"):
             numbers= sorted(random.sample(range(1, 100), 20))
             target = numbers[2]
             svgcontent=  SVGContent(numbers)
-            with ui.column().style("width: 80vw; height: 30vw; justify-content:center; text-align:center; align-items:center;"):
+            with ui.column().style("width: 70vw; height: 30vw; justify-content:center; text-align:center; align-items:center;"):
                 target_label = ui.label(f"Searching for: {target}").style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:center;")
                 target_label.bind_text_from(svgcontent, "target", backward=lambda x: "Searching for: " + str(x)).style("font-size: 20px; font-weight: bold; margin-bottom: 20px; justify-content:right;")
-                image = ui.interactive_image(source="/static/binsearchsvg.svg").style("width: 85vw;")
+                image = ui.interactive_image(source="/static/binsearchsvg.svg").style("width: 65vw;")
                 image.bind_content_from(svgcontent, 'content')
                 current_comparison_text = ui.label().style("font-size: 20px; font-weight: bold; margin-bottom: 20px; ")
                 current_comparison_text.bind_text_from(svgcontent, "target", backward=lambda x: do_comparison(x, svgcontent.numbers, svgcontent.middle))
 
         
             # with ui.row().style("width: 35vw;"):
-            with ui.column().style("width: 10vw; "):
+            with ui.column().style("width: 10vw; right: 0vw;"):
                 with ui.row():
                     ui.input("Target", value=target).bind_value_to(svgcontent, "target", forward= lambda x : int(x)).style("font-size: 0.75vw; ")
                 with ui.row():
@@ -188,11 +188,10 @@ def add():
                 with ui.row():
                     ui.button("Reset", on_click=lambda e : stuff.refresh()).style("font-size: 0.75vw; ")
     
-            # with ui.column().style("width: 50vw;"):
-            #     with ui.row():
+
             
             
-            with ui.row().style("width: 100vw; justify-content:center; align-items:center; height: fit-content;"):
+        with ui.row().style("width: 100vw; justify-content:center; align-items:center; height: fit-content;"):
                 with ui.row().style("width: 60vw; justify-content:center; align-items:center; border: 1px solid black; background-color: lightgrey; border-radius: 10px; padding: 10px; overflow-y: visible; min-height: fit-content;"):
 
                     with ui.column().style("display: flex; justify-content: center; align-items: center; width: 100vw; "):
